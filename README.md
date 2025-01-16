@@ -8,20 +8,19 @@
 [![GitHub issues open](https://img.shields.io/github/issues/Ztrimus/job-llm.svg?color=orange&label=Issues&logo=github)](https://github.com/Ztrimus/job-llm/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg?logo)](https://github.com/Ztrimus/job-llm/blob/main/LICENSE)
 
+## Framework
+### Original Design
 [![Click here to see image of "Auto Job Aligned Personalized Resume Generation Pipeline"](https://github.com/Ztrimus/job-llm/blob/main/resources/auto_job_apply_workflow.jpg)](https://github.com/Ztrimus/job-llm/blob/main/resources/auto_job_apply_workflow.jpg)
-<br>For **Video Demonstration** visit the YouTube link: https://youtu.be/Agl7ugyu1N4
+### Target Framework
+<img width="950" alt="image" src="https://github.com/user-attachments/assets/8040eeb1-af92-4c9c-aa44-bd31c04d29e3" />
 
-Project can be:
- - Access as a **Web Tool** from https://resumeflow.streamlit.app/
- - Install as a **Python Package** from https://pypi.org/project/zlm/
- - Download as **Source Code** from https://github.com/Ztrimus/job-llm.git
- 
-All other known bugs, fixes, feedbacks, and feature requests can be reported on the [GitHub issues](https://github.com/Ztrimus/job-llm/issues) page.
+ All other known bugs, fixes, feedbacks, and feature requests can be reported on the [GitHub issues](https://github.com/Ztrimus/job-llm/issues) page.
 
 **Empower others, just like they helped you!** Contribute to this open source project & make a difference. ✨ *Create a branch, improve the code, & raise a pull request!*
 
-#### Author & Contributor List
-
+### Author & Contributor List
+#### 
+#### Original Authors
  - [Saurabh Zinjad](https://linkedin.com/in/saurabhzinjad) | [Ztrimus](https://github.com/Ztrimus) | szinjad@asu.edu
  - [Amey Bhilegaonkar](https://www.linkedin.com/in/amey-bhilegaonkar) | [ameygoes](https://github.com/ameygoes) | abhilega@asu.edu
  - [Amrita Bhattacharjee](https://www.linkedin.com/in/amritabh) | [Amritabh](https://github.com/Amritabh) | abhatt43@asu.edu
