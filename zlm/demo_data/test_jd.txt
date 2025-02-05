@@ -1,0 +1,18 @@
+Affirm company aims to give consumers the flexibility to buy now and pay later without any hidden fees or compounding interest. Join Affirm’s ML Fraud team as a Machine Learning Engineer II and advance our capabilities in detecting and preventing online fraud. Leverage cutting-edge algorithms and proprietary data to outsmart fraudsters while ensuring seamless experiences for genuine customers. Your work will directly impact Affirm's financial performance by developing sophisticated models for real time transaction decisions.
+Collaborate with experts to tackle complex challenges, create innovative solutions for emerging fraud patterns, and advance our fraud detection capabilities. If you're passionate about machine learning, thrive on challenges, and want to make a tangible difference in fintech, Affirm is your opportunity. Help us create honest financial products that improve lives while growing your career in a dynamic, impactful environment.
+What You'll Do:
+Use Affirm’s proprietary and other third party data to develop machine learning models that predict the likelihood of fraud. These models will protect victims’ identities from being stolen, prevent Affirm from incurring financial loss, and increase the trust that consumers and partners have in the Affirm ecosystem.
+Partner with the ML platform team to build fraud specific ML infrastructure
+Research ground breaking solutions and develop prototypes that drive the future of fraud decisioning at Affirm
+Implement and scale data pipelines, new features, and algorithms that are essential to our production models
+Collaborate with the engineering, fraud, and product teams to define requirements for new products
+Develop fraud models to maximize user conversion while minimizing fraud losses and data costs.
+What We Look For:
+2+ years of experience as a machine learning engineer or PhD in a relevant field
+Proficiency in machine learning with experience in areas such as gradient boosting, online learning, and deep learning. Domain knowledge in fraud risk is a plus
+Strong programming skills in Python
+Experience using large scale distributed systems like Spark and Ray
+Experience using machine learning frameworks such as scikit-learn, pandas, numpy, xgboost, and pytorch
+Excellent written and oral communication skills and the capability to drive cross-functional requirements with product and engineering teams
+The ability to present technical concepts and results in an audience-appropriate way
+Persistence, patience and a strong sense of responsibility – we build the decision making that enables consumers and partners to place their trust in Affirm!

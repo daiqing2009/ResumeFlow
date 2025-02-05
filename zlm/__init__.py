@@ -81,6 +81,21 @@ class AutoApplyModel:
         else:
             raise Exception("Invalid LLM Provider")
 
+
+    def resume_plain_text(self, pdf_path):
+        """
+        Converts a resume in PDF format to JSON format.
+
+        Args:
+            pdf_path (str): The path to the PDF file.
+
+        Returns:
+            dict: The resume data in plain text.
+        """
+        resume_text = extract_text(pdf_path)
+        print("resume_json Text:{}".format(resume_text))
+        return resume_text
+
     def resume_to_json(self, pdf_path):
         """
         Converts a resume in PDF format to JSON format.
@@ -92,7 +107,6 @@ class AutoApplyModel:
             dict: The resume data in JSON format.
         """
         resume_text = extract_text(pdf_path)
-
         json_parser = JsonOutputParser(pydantic_object=ResumeSchema)
 
         prompt = PromptTemplate(
@@ -100,8 +114,9 @@ class AutoApplyModel:
             input_variables=["resume_text"],
             partial_variables={"format_instructions": json_parser.get_format_instructions()}
             ).format(resume_text=resume_text)
-
+        print("PDF prompt:{}".format(prompt))
         resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
+        print("resume_json Text:{}".format(resume_json))
         return resume_json
 
     @utils.measure_execution_time
@@ -123,7 +138,9 @@ class AutoApplyModel:
         extension = os.path.splitext(user_data_path)[1]
 
         if extension == ".pdf":
-            user_data = self.resume_to_json(user_data_path)
+            user_data = self.resume_plain_text(user_data_path)
+            # user_data = self.resume_to_json(user_data_path)
+            print("User data:{}".format(user_data))
         elif extension == ".json":
             user_data = utils.read_json(user_data_path)
         elif validators.url(user_data_path):
@@ -222,7 +239,6 @@ class AutoApplyModel:
             st.write("Error: \n\n",e)
             return None, None
 
-
     @utils.measure_execution_time
     def resume_builder(self, job_details: dict, user_data: dict, is_st=False):
         """
@@ -243,15 +259,96 @@ class AutoApplyModel:
             if is_st: st.toast("Generating Resume Details...")
 
             resume_details = dict()
+            # Personal Information Section
+            if is_st: st.toast("Processing Resume's Personal Info Section...")
+            response_ud = self.llm.get_response(prompt="Extract the applicant's name, phone, email, github, and linkedin, as 'name', 'phone', 'email', 'github', 'linkedin' from the given data, ensure clarity and correctness, data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
+            print("Response User Data Text: {}".format(response_ud))
+            if response_ud is not None and isinstance(response_ud, dict):
+                resume_details["personal"] = {
+                    "name": response_ud.get("name") if response_ud.get("name") is not None else "",
+                    "phone": response_ud.get("phone") if response_ud.get("phone") is not None else "",
+                    "email": response_ud.get("email") if response_ud.get("email") is not None else "",
+                    "github": response_ud.get("github") or "",
+                    "linkedin": response_ud.get("linkedin") or ""
+                }
+                st.markdown("**Personal Info Section**")
+                st.write(resume_details)
 
+            # Other Sections
+            for section in ['work_experience', 'projects', 'skill_section', 'education', 'certifications',
+                            'achievements']:
+                section_log = f"Processing Resume's {section.upper()} Section..."
+                if is_st: st.toast(section_log)
+
+                json_parser = JsonOutputParser(pydantic_object=section_mapping[section]["schema"])
+                prompt = PromptTemplate(
+                    input_variables=[str(section)],
+                    template=section_mapping[section]["prompt"],
+                    partial_variables={"format_instructions": json_parser.get_format_instructions()}
+                ).format(section_data=user_data, job_description=json.dumps(job_details))
+
+                response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+
+                # Check for empty sections
+                if response is not None and isinstance(response, dict):
+                    if section in response:
+                        if response[section]:
+                            if section == "skill_section":
+                                resume_details[section] = [i for i in response['skill_section'] if len(i['skills'])]
+                            else:
+                                resume_details[section] = response[section]
+
+                if is_st:
+                    st.markdown(f"**{section.upper()} Section**")
+                    st.write(response)
+
+            if job_details.get("keyskills") is not None:
+                resume_details['keyskills'] = ', '.join(job_details['keyskills'])
+
+            resume_path = utils.job_doc_name(job_details, self.downloads_dir, "resume")
+            utils.write_json(resume_path, resume_details)
+            resume_path = resume_path.replace(".json", ".pdf")
+            st.write(f"resume_path: {resume_path}")
+
+            resume_latex = latex_to_pdf(resume_details, resume_path)
+            # st.write(f"resume_pdf_path: {resume_pdf_path}")
+
+            return resume_path, resume_details
+        except Exception as e:
+            print(e)
+            st.write("Error: \n\n", e)
+            return resume_path, resume_details
+
+
+    @utils.measure_execution_time
+    def resume_builder_bk(self, job_details: dict, user_data: dict, is_st=False):
+        """
+        Builds a resume based on the provided job details and user data.
+
+        Args:
+            job_details (dict): A dictionary containing the job description.
+            user_data (dict): A dictionary containing the user's resume or work information.
+
+        Returns:
+            dict: The generated resume details.
+
+        Raises:
+            FileNotFoundError: If the system prompt files are not found.
+        """
+        try:
+            print("\nGenerating Resume Details...")
+            if is_st: st.toast("Generating Resume Details...")
+
+            resume_details = dict()
+            print("User Data Text: {}".format(user_data))
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
             resume_details["personal"] = { 
-                "name": user_data["name"], 
-                "phone": user_data["phone"], 
-                "email": user_data["email"],
-                "github": user_data["media"]["github"], 
-                "linkedin": user_data["media"]["linkedin"]
+                "name":  user_data.get("name") if  user_data.get("name") is not None else "",
+                "phone": user_data.get("phone") if  user_data.get("phone") is not None else "",
+                "email": user_data.get("email") if user_data.get("email") is not None else "",
+                "github": user_data.get("media", {}).get("github") or "",
+                "linkedin": user_data.get("media", {}).get("linkedin") or ""
                 }
             st.markdown("**Personal Info Section**")
             st.write(resume_details)
@@ -260,13 +357,14 @@ class AutoApplyModel:
             for section in ['work_experience', 'projects', 'skill_section', 'education', 'certifications', 'achievements']:
                 section_log = f"Processing Resume's {section.upper()} Section..."
                 if is_st: st.toast(section_log)
-
+                if user_data.get(section) is None:
+                    continue
                 json_parser = JsonOutputParser(pydantic_object=section_mapping[section]["schema"])
-                
                 prompt = PromptTemplate(
+                    input_variables=[str(section)],
                     template=section_mapping[section]["prompt"],
                     partial_variables={"format_instructions": json_parser.get_format_instructions()}
-                    ).format(section_data = json.dumps(user_data[section]), job_description = json.dumps(job_details))
+                    ).format(section_data = json.dumps(user_data.get(section)), job_description = json.dumps(job_details))
 
                 response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
 
@@ -283,13 +381,13 @@ class AutoApplyModel:
                     st.markdown(f"**{section.upper()} Section**")
                     st.write(response)
 
-            resume_details['keywords'] = ', '.join(job_details['keywords'])
+            if job_details.get("keyskills") is not None:
+                resume_details['keyskills'] = ', '.join(job_details['keyskills'])
             
             resume_path = utils.job_doc_name(job_details, self.downloads_dir, "resume")
-
             utils.write_json(resume_path, resume_details)
             resume_path = resume_path.replace(".json", ".pdf")
-            # st.write(f"resume_path: {resume_path}")
+            st.write(f"resume_path: {resume_path}")
 
             resume_latex = latex_to_pdf(resume_details, resume_path)
             # st.write(f"resume_pdf_path: {resume_pdf_path}")

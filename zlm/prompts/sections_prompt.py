@@ -1,17 +1,12 @@
-ACHIEVEMENTS ="""You are going to write a JSON resume section of "Achievements" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my achievements details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches
-3. Optimize JSON section for clarity and relevance to the job description.
-
+ACHIEVEMENTS = """write a resume section of "Achievements" in JSON format for a job applicant.
+ 
 Instructions:
-1. Focus: Craft relevant achievements aligned with the job description.
-2. Honesty: Prioritize truthfulness and objective language.
-3. Specificity: Prioritize relevance to the specific job over general achievements.
-4. Style:
-  4.1. Voice: Use active voice whenever possible.
-  4.2. Proofreading: Ensure impeccable spelling and grammar.
+- Analyze the given resume data
+- Highlight relevant achievements tailored to the job description. 
+- Remain the provided achievements.  
+- Highlight the strongest matches in the section.   
+- Use active voice, concise wording, and error-free grammar.  
+- Ensure clarity, relevance, and grammatical accuracy.
 
 <achievements>
 {section_data}
@@ -33,16 +28,13 @@ Instructions:
 {format_instructions}
 """
 
-CERTIFICATIONS = """You are going to write a JSON resume section of "Certifications" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my certification details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches
-3. Optimize JSON section for clarity and relevance to the job description.
+CERTIFICATIONS = """Write a resume section of "Certifications" in JSON format for a job applicant.
 
 Instructions:
-1. Focus: Include relevant certifications aligned with the job description.
-2. Proofreading: Ensure impeccable spelling and grammar.
+- Analyze the given resume data and extract the information of certifications.
+- Remain certifications highlighted in the given data.
+- Align certifications with the requirements in the job description.
+- Ensure grammatical accuracy and clarity. 
 
 <CERTIFICATIONS>
 {section_data}
@@ -71,19 +63,13 @@ Instructions:
 {format_instructions}
 """
 
-EDUCATIONS = """You are going to write a JSON resume section of "Education" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my education details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches
-3. Optimize JSON section for clarity and relevance to the job description.
+EDUCATIONS = """Write a resume section of "Education" in JSON format for a job applicant.
 
 Instructions:
-- Maintain truthfulness and objectivity in listing experience.
-- Prioritize specificity - with respect to job - over generality.
-- Proofread and Correct spelling and grammar errors.
-- Aim for clear expression over impressiveness.
-- Prefer active voice over passive voice.
+- Analyze the education details provided.  
+- Create a section highlighting the strongest matches.  
+- Ensure clarity, accuracy, and alignment with the job description.  
+- Use active voice and concise language.
 
 <Education>
 {section_data}
@@ -115,28 +101,16 @@ Instructions:
 {format_instructions}
 """
 
-
-PROJECTS="""You are going to write a JSON resume section of "Project Experience" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my project details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches
-3. Optimize JSON section for clarity and relevance to the job description.
+PROJECTS = """Write a resume section in JSON format of "Project Experience" for a job applicant.
 
 Instructions:
-1. Focus: Craft three highly relevant project experiences aligned with the job description.
-2. Content:
-  2.1. Bullet points: 3 per experience, closely mirroring job requirements.
-  2.2. Impact: Quantify each bullet point for measurable results.
-  2.3. Storytelling: Utilize STAR methodology (Situation, Task, Action, Result) implicitly within each bullet point.
-  2.4. Action Verbs: Showcase soft skills with strong, active verbs.
-  2.5. Honesty: Prioritize truthfulness and objective language.
-  2.6. Structure: Each bullet point follows "Did X by doing Y, achieved Z" format.
-  2.7. Specificity: Prioritize relevance to the specific job over general achievements.
-3. Style:
-  3.1. Clarity: Clear expression trumps impressiveness.
-  3.2. Voice: Use active voice whenever possible.
-  3.3. Proofreading: Ensure impeccable spelling and grammar.
+- Refine the description of projects to align with job requirements.  
+- Highlight three relevant projects with impacts. 
+- Format each project with 3 bullet points.  
+- Quantify results and follow “Did X by doing Y, achieved Z” format.  
+- Use the STAR method (Situation, Task, Action, Result).
+- Structure each project using concise, active, and job-relevant language.
+- Proofread for clarity, grammar, and spelling.  
 
 <PROJECTS>
 {section_data}
@@ -163,20 +137,18 @@ Instructions:
     [and So on ...]
   ]
   </example>
-  
+
   {format_instructions}
   """
 
-SKILLS="""You are going to write a JSON resume section of "Skills" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my Skills details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches.
-3. Optimize JSON section for clarity and relevance to the job description.
+SKILLS = """Write a resume section of "Skills" in JSON format for a job applicant.
 
 Instructions:
-- Specificity: Prioritize relevance to the specific job over general achievements.
-- Proofreading: Ensure impeccable spelling and grammar.
+- Analyze the provided skills and job description.  
+- Focus on specific skills required for the job.
+- Highlight the most relevant skills in a JSON format.
+- Ensure clarity, accuracy, and alignment with the job description. 
+- Proofread for grammatical accuracy and clarity.
 
 <SKILL_SECTION>
 {section_data}
@@ -199,32 +171,19 @@ Instructions:
     and so on ...
   ]
 </example>
-  
+
   {format_instructions}
   """
 
-
-EXPERIENCE="""You are going to write a JSON resume section of "Work Experience" for an applicant applying for job posts.
-
-Step to follow:
-1. Analyze my Work details to match job requirements.
-2. Create a JSON resume section that highlights strongest matches
-3. Optimize JSON section for clarity and relevance to the job description.
+EXPERIENCE = """Write a resume section of "Work Experience" in JSON format for a job applicant. 
 
 Instructions:
-1. Focus: Craft three highly relevant work experiences aligned with the job description.
-2. Content:
-  2.1. Bullet points: 3 per experience, closely mirroring job requirements.
-  2.2. Impact: Quantify each bullet point for measurable results.
-  2.3. Storytelling: Utilize STAR methodology (Situation, Task, Action, Result) implicitly within each bullet point.
-  2.4. Action Verbs: Showcase soft skills with strong, active verbs.
-  2.5. Honesty: Prioritize truthfulness and objective language.
-  2.6. Structure: Each bullet point follows "Did X by doing Y, achieved Z" format.
-  2.7. Specificity: Prioritize relevance to the specific job over general achievements.
-3. Style:
-  3.1. Clarity: Clear expression trumps impressiveness.
-  3.2. Voice: Use active voice whenever possible.
-  3.3. Proofreading: Ensure impeccable spelling and grammar.
+- Match work experience tailored to the job requirements.
+- Highlight three relevant experiences with clear outcomes.
+- Include 3 bullet points per experience, quantifying results when possible.  
+- Use the STAR method (Situation, Task, Action, Result).
+- Format bullet points.
+- Use clear, concise, and job-relevant language. 
 
 <work_experience>
 {section_data}

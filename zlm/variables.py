@@ -17,7 +17,7 @@ GPT_EMBEDDING_MODEL = "text-embedding-ada-002"
 GEMINI_EMBEDDING_MODEL = "models/text-embedding-004"
 # models/embedding-001
 
-OLLAMA_EMBEDDING_MODEL = "bge-m3"
+OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large"
 
 DEFAULT_LLM_PROVIDER = "Gemini"
 DEFAULT_LLM_MODEL = "gemini-1.5-flash"
@@ -31,10 +31,10 @@ LLM_MAPPING = {
         "api_env": "GEMINI_API_KEY",
         "model": ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-1.5-pro-latest", "gemini-1.5-pro-exp-0801"], # "gemini-1.0-pro", "gemini-1.0-pro-latest"
     },
-    # 'Ollama': {
-    #     "api_env": None,
-    #     "model": ['llama3.1', 'llama3'],
-    # }
+    'Ollama': {
+        "api_env": None,
+        "model": ['gemma2:9b'],
+    }
 }
 
 section_mapping = {

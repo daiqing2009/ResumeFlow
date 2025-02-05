@@ -111,7 +111,7 @@ try:
 
     col_1, col_2, col_3 = st.columns(3)
     with col_1:
-        provider = st.selectbox("Select provider([OpenAI](https://openai.com/blog/openai-api), [Gemini Pro](https://ai.google.dev/)):", LLM_MAPPING.keys())
+        provider = st.selectbox("Select provider([OpenAI](https://openai.com/blog/openai-api), [Gemini Pro](https://ai.google.dev/), [Ollama](http://localhost:11434):", LLM_MAPPING.keys())
     with col_2:
         model = st.selectbox("Select model:", LLM_MAPPING[provider]['model'])
     with col_3:
@@ -187,6 +187,7 @@ try:
             # Build Resume
             if get_resume_button:
                 with st.status("Building resume..."):
+                    # resume_path, resume_details = resume_llm.resume_builder_bk(job_details, user_data, is_st=True)
                     resume_path, resume_details = resume_llm.resume_builder(job_details, user_data, is_st=True)
                     # st.write("Outer resume_path: ", resume_path)
                     # st.write("Outer resume_details is None: ", resume_details is None)

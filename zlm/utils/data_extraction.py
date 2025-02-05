@@ -63,16 +63,18 @@ def extract_text(pdf_path: str):
 
         for page_num in range(num_pages):
             page = pdf_reader.pages[page_num]
-            text = page.extract_text().split("\n")
-
+            text = page.extract_text()
+            if not text:
+                continue
+            text_lines = text.split("\n")
+            cleaned_text = [re.sub(r'[^\w\s,.!?@#&()\-\']+', '', line) for line in text_lines]
             # Remove Unicode characters from each line
-            cleaned_text = [re.sub(r'[^\x00-\x7F]+', '', line) for line in text]
 
             # Join the lines into a single string
-            cleaned_text_string = '\n'.join(cleaned_text)
-            resume_text += cleaned_text_string
+            cleaned_text_string = '\n'.join(cleaned_text).strip()
+            resume_text += cleaned_text_string + "\n"
         
-        return resume_text
+        return resume_text.strip()
 
 def get_url_content(url: str):
     """ Extract text content from any given web page

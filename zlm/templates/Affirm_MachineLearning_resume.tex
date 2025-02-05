@@ -1,0 +1,110 @@
+%==== PACKAGES AND OTHER DOCUMENT CONFIGURATIONS  ====%
+\documentclass{resume} % Use the custom resume.cls style
+\usepackage[left=0.25in,top=0.25in,right=0.25in,bottom=0.25in]{geometry} % Document margins
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{fontawesome} % For GitHub and LinkedIn symbols
+\usepackage{textcomp} % For mobile phone and email symbols
+% \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{xcolor}  % Required for defining custom colors
+\usepackage{hyperref}
+% Define your custom colors
+% \definecolor{myblue}{RGB}{173, 216, 246}
+% \definecolor{myblue}{RGB}{123, 176, 206}
+\definecolor{myblue}{RGB}{0, 164, 218}
+
+% Set hyperlink colors
+\hypersetup{
+    colorlinks=true,
+    linkcolor=myblue,
+    citecolor=myblue,
+    urlcolor=myblue
+}
+
+\usepackage{hyperref}
+
+%==== Headings ====%
+\name{Saurabh Zinjad} % Your name
+\address{
+{\faPhone} \href{tel:+1 480 913 5544}{+14809135544} \quad {\faEnvelope} \href{mailto:saurabhzinjad@gmail.com}{saurabhzinjad@gmail.com} \quad {\faGithub} \href{github.com/Ztrimus}{github.com/Ztrimus} \quad {\faLinkedin} \href{linkedin.com/in/saurabhzinjad}{linkedin.com/in/saurabhzinjad} }
+
+\begin{document}
+
+%===== WORK EXPERIENCE SECTION =====%
+    \begin{rSection}{Work Experience}
+                    \begin{rSubsection}
+                {Software Engineer}{Jan 2020 - Jun 2022}
+                                    {\normalfont{\textit{Winjit Technologies}}}
+                                {\normalfont{\textit{Pune, India}}}
+                                    \item Engineered 10+ RESTful APIs Architecture and Distributed services; Designed 30+ low{-}latency responsive UI/UX application features with high{-}quality web architecture; Managed and optimized large{-}scale Databases. (Systems Design)
+                                    \item Initiated and Designed a standardized solution for dynamic forms generation, with customizable CSS capabilities feature, which reduces development time by 8x; Led and collaborated with a 12 member cross{-}functional team. (Idea Generation)
+                            \end{rSubsection}
+                    \begin{rSubsection}
+                {Research Intern}{Mar 2019 - Aug 2019}
+                                    {\normalfont{\textit{IMATMI}}}
+                                {\normalfont{\textit{New Jersey (Remote)}}}
+                                    \item Conducted research and developed a range of ML and statistical models to design analytical tools and streamline HR processes, optimizing talent management systems for increased efficiency.
+                                    \item Created 'goals and action plan generation' tool for employees, considering their weaknesses to facilitate professional growth.
+                                    \item Developed and implemented data analysis algorithms to identify key performance indicators (KPIs) and trends in employee data, leading to improved talent acquisition strategies.
+                            \end{rSubsection}
+            \end{rSection}
+
+%==== EDUCATION SECTION ====%
+\begin{rSection}{Education}
+                        \textbf{Arizona State University, Tempe, USA} \hfill {Aug 2023 - May 2025} \\
+                            {Masters of Science {-} Computer Science (Thesis)}
+                         
+             
+         
+                        \textbf{Pune Institute of Computer Technology(PICT), Savitribai Phule Pune University, India} \hfill {Jul 2015 - Jun 2019} \\
+                            {Bachelor of Engineering {-} Electronics and Telecommunication}
+                                        \hfill {(GPA: 8.53/10)}
+             
+             
+         
+    \end{rSection}
+
+% ==== PROJECTS SECTION =====%
+    \begin{rSection}{Projects}
+                    \begin{rSubsection}
+                                    {\href{https://devpost.com/software/team{-}soul{-}1fjgwo}{Search Engine for All file types {-} Sunhack Hackathon {-} Meta \& Amazon Sponsored}}
+                                {\normalfont{Nov 2023 - Nov 2023}}{}{}
+                                    \item 1st runner up prize in crafted AI persona, to explore LLM's subtle contextual understanding and create innovative collaborations between humans and machines.
+                                    \item Devised a TabNet Classifier Model having 98.7\% accuracy in detecting forest fire through IoT sensor data, deployed on AWS and edge devices 'Silvanet Wildfire Sensors' using technologies TinyML, Docker, Redis, and celery.
+                            \end{rSubsection}
+                    \begin{rSubsection}
+                                    {Forest Fire Detection System {-} Sunhack Hackathon}
+                                {\normalfont{Nov 2023 - Nov 2023}}{}{}
+                                    \item 1st runner up prize in crafted AI persona, to explore LLM's subtle contextual understanding and create innovative collaborations between humans and machines.
+                            \end{rSubsection}
+            \end{rSection}
+
+%==== TECHNICAL STRENGTHS SECTION ====%
+    \begin{rSection}{Technical Skills}
+        \begin{tabular}{ @{} l @{\hspace{1ex}} l }
+                                \textbf{Machine Learning}: Gradient Boosting, Online Learning, Deep Learning, Fraud Risk\\
+                                \textbf{Programming Languages}: Python, Spark, Ray, Scikit{-}learn, Pandas, NumPy\\
+                                \textbf{Data Manipulation \& Analysis}: XGBoost, PyTorch\\
+                        \textbf{Certifications:} 
+                                            \href{https://www.coursera.org/account/accomplishments/specialization/G3WPNWRYX628}{\textbf{Deep Learning Specialization}},\\
+                                            \href{https://drive.google.com/file/d/1fh4AEscb0P82nfoaA{-}muWMzmFngzyk2g/view}{\textbf{MLOps for AI Engineers and Data Scientists}},\\
+                                 
+        \end{tabular}
+    \end{rSection}
+ 
+
+% ACHIEVEMENTS SECTION
+    \begin{rSection}{Achievements}
+        \begin{rSubsection}{}{}{}
+                            \item 1st runner{-}up in “Prompt Engineering Hackathon 2023 for Humanities”
+                            \item Received the 'Extra Miller {-} 2021' award at Winjit Technologies for outstanding performance.
+                            \item President of Machine Learning Club: Led a team of 20 people in a project and was awarded "Best Project of the Year." 
+                    \end{rSubsection}
+    \end{rSection}
+
+\newcommand\myfontsize{\fontsize{0.1pt}{0.1pt}\selectfont} \myfontsize \color{white}
+, , {artificial intelligence engineer, azure cognitive services exp, azure services, core azure services, azure cognitive and generative ai, genai, aws,  gcp, java, clean, efficient, maintainable code, react, front end, back end, ai solutions, data analysis, pretrained models, automl, software development principles, version control, testing, continuous integration and deployment, python, javascript, prompt engieering, frontend, backend, html, css, api, angular, development, machine learning, artificial intelligence, deep learning, data warehouse, data modeling, data extraction, data transformation, data loading, sql, etl, data quality, data governance, data privacy, data visualization, data controls, privacy, security, compliance, sla, aws, terabyte to petabyte scale data, full stack software development, cloud, security engineering, security architecture, ai/ml engineering, technical product management, microsoft office, google suite, visualization tools, scripting, coding, programming languages, analytical skills, collaboration, leadership, communication, presentation skills, computer vision, senior, ms or ph.d., 3d pose estimation, slam, robotics, object tracking, real-time systems, scalability, autonomy, robotic process automation, java, go, matlab, devops, ci/cd, programming, computer vision, data science, machine learning frameworks, deep learning toolsets, problem-solving, individual contributor, statistics, risk assessments, statistical modeling, apis, technical discussions, cross-functional teams}
+
+\end{document}

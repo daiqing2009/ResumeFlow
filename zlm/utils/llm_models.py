@@ -11,6 +11,7 @@ import json
 import textwrap
 import pandas as pd
 import streamlit as st
+import requests
 from openai import OpenAI
 from langchain_community.llms.ollama import Ollama
 from langchain_ollama import OllamaEmbeddings
@@ -122,33 +123,58 @@ class Gemini:
 
 class OllamaModel:
     def __init__(self, model, system_prompt):
-        self.model = model
+        self.model = "gemma2:9b"
         self.system_prompt = system_prompt
     
     def get_response(self, prompt, expecting_longer_output=False, need_json_output=False):
         try:
-            llm = Ollama(
-                model=self.model, 
-                system=self.system_prompt,
-                temperature=0.8, 
-                top_p=0.999, 
-                top_k=250,
-                num_predict=4000 if expecting_longer_output else None,
-                # format='json' if need_json_output else None,
+            try:
+                llm = Ollama(
+                    model=self.model,
+                    system=self.system_prompt,
+                    temperature=0.8,
+                    top_p=0.9,
+                    top_k=300,
+                    num_predict=5000 if expecting_longer_output else None,
+                    format='json' if need_json_output else None,
                 )
-            content = llm.invoke(prompt)
+                content = llm.invoke(str(prompt))
+                print("Response from Llama: {}".format(content))
+                if need_json_output:
+                    result = parse_json_markdown(content)
+                else:
+                    result = content
 
-            if need_json_output:
-                result = parse_json_markdown(content)
-            else:
-                result = content
-            
-            if result is None:
-                st.write("LLM Response")
-                st.markdown(f"```json\n{content.text}\n```")
+                if result is None:
+                    st.write("LLM Response")
+                    st.markdown(f"```json\n{content.text}\n```")
 
-            return result
-        
+                return result
+
+            except requests.exceptions.RequestException as e:
+                print(f"An error occurred: {e}")
+            # llm = Ollama(
+            #     model=self.model,
+            #     system=self.system_prompt,
+            #     temperature=0.8,
+            #     top_p=0.9,
+            #     top_k=150,
+            #     num_predict=2500 if expecting_longer_output else None,
+                # format='json' if need_json_output else None,
+            #     )
+            # content = llm.invoke(prompt)
+
+            # if need_json_output:
+            #     result = parse_json_markdown(content)
+            # else:
+            #     result = content
+            #
+            # if result is None:
+            #     st.write("LLM Response")
+            #     st.markdown(f"```json\n{content.text}\n```")
+            #
+            # return result
+            return None
         except Exception as e:
             print(e)
             st.error(f"Error in Ollama model - {self.model}, {e}")
