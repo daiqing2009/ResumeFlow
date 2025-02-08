@@ -17,6 +17,7 @@ import streamlit as st
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
+from zlm.prompts.convert_prompt import RESUME_CONVERT, JD_CONVERT
 from zlm.schemas.sections_schemas import ResumeSchema
 from zlm.utils import utils
 from zlm.utils.latex_ops import latex_to_pdf
@@ -171,15 +172,15 @@ class AutoApplyModel:
             if url is not None and url.strip() != "":
                 job_site_content = read_data_from_url(url)
             if job_site_content:
-                json_parser = JsonOutputParser(pydantic_object=JobDetails)
+                # json_parser = JsonOutputParser(pydantic_object=JobDetails)
                 
-                prompt = PromptTemplate(
-                    template=JOB_DETAILS_EXTRACTOR,
-                    input_variables=["job_description"],
-                    partial_variables={"format_instructions": json_parser.get_format_instructions()}
-                    ).format(job_description=job_site_content)
+                # prompt = PromptTemplate(
+                #     template=JOB_DETAILS_EXTRACTOR,
+                #     input_variables=["job_description"],
+                #     partial_variables={"format_instructions": json_parser.get_format_instructions()}
+                #     ).format(job_description=job_site_content)
 
-                job_details = self.llm.get_response(prompt=prompt, need_json_output=True)
+                job_details = self.llm.get_response(prompt=JD_CONVERT+" Job description: {}".format(job_site_content), expecting_longer_output=True, need_json_output=True)
 
                 if url is not None and url.strip() != "":
                     job_details["url"] = url
@@ -261,19 +262,25 @@ class AutoApplyModel:
             resume_details = dict()
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
-            response_ud = self.llm.get_response(prompt="Extract the applicant's name, phone, email, github, and linkedin, as 'name', 'phone', 'email', 'github', 'linkedin' from the given data, ensure clarity and correctness, data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
-            print("Response User Data Text: {}".format(response_ud))
-            if response_ud is not None and isinstance(response_ud, dict):
+            json_formatted_resume = self.llm.get_response(
+                prompt=RESUME_CONVERT+" Plain text data: {}".format(user_data), need_json_output=True)
+
+            # response_ud = self.llm.get_response(prompt="Extract the applicant's name, phone, email, github, and linkedin, as 'name', 'phone', 'email', 'github', 'linkedin' from the given JSON data, JSON data: {}".format(json_formatted_resume), expecting_longer_output=True, need_json_output=True)
+            print("Response User Data Text: {}".format(json_formatted_resume))
+            if json_formatted_resume is not None and isinstance(json_formatted_resume, dict):
                 resume_details["personal"] = {
-                    "name": response_ud.get("name") if response_ud.get("name") is not None else "",
-                    "phone": response_ud.get("phone") if response_ud.get("phone") is not None else "",
-                    "email": response_ud.get("email") if response_ud.get("email") is not None else "",
-                    "github": response_ud.get("github") or "",
-                    "linkedin": response_ud.get("linkedin") or ""
+                    "name": json_formatted_resume.get("name") if json_formatted_resume.get("name") is not None else "",
+                    "phone": json_formatted_resume.get("phone") if json_formatted_resume.get("phone") is not None else "",
+                    "email": json_formatted_resume.get("email") if json_formatted_resume.get("email") is not None else "",
+                    "github": json_formatted_resume.get("github") or "",
+                    "linkedin": json_formatted_resume.get("linkedin") or ""
                 }
                 st.markdown("**Personal Info Section**")
                 st.write(resume_details)
 
+            if json_formatted_resume.get("skills") is not None:
+                resume_details['keyskills'] = json_formatted_resume['skills']
+                # resume_details['keyskills'] = ', '.join(json_formatted_resume['skills'])
             # Other Sections
             for section in ['work_experience', 'projects', 'skill_section', 'education', 'certifications',
                             'achievements']:
@@ -285,7 +292,7 @@ class AutoApplyModel:
                     input_variables=[str(section)],
                     template=section_mapping[section]["prompt"],
                     partial_variables={"format_instructions": json_parser.get_format_instructions()}
-                ).format(section_data=user_data, job_description=json.dumps(job_details))
+                ).format(section_data=json_formatted_resume, job_description=json.dumps(job_details))
 
                 response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
 
@@ -301,9 +308,6 @@ class AutoApplyModel:
                 if is_st:
                     st.markdown(f"**{section.upper()} Section**")
                     st.write(response)
-
-            if job_details.get("keyskills") is not None:
-                resume_details['keyskills'] = ', '.join(job_details['keyskills'])
 
             resume_path = utils.job_doc_name(job_details, self.downloads_dir, "resume")
             utils.write_json(resume_path, resume_details)
