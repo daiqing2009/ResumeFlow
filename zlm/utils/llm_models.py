@@ -36,8 +36,8 @@ class ChatGPT:
             completion = self.client.chat.completions.create(
                 model=self.model,
                 messages = [self.system_prompt, user_prompt],
-                temperature=0,
-                max_tokens = 4000 if expecting_longer_output else None,
+                temperature=1.0,
+                max_tokens = 5000 if expecting_longer_output else None,
                 response_format = { "type": "json_object" } if need_json_output else None
             )
 
@@ -134,7 +134,7 @@ class OllamaModel:
                     system=self.system_prompt,
                     temperature=0.8,
                     top_p=0.9,
-                    top_k=300,
+                    top_k=200,
                     num_predict=5000 if expecting_longer_output else None,
                     format='json' if need_json_output else None,
                 )

@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 class JobDetails(BaseModel):
     job_title: str = Field(description="job title")
     job_purpose: str = Field(description="job role")
-    keyskills: List[str] = Field(description="Required skills")
+    keyskills: Optional[List[str]] = Field(description="Required skills")
     job_duties_and_responsibilities: List[str] = Field(description="job responsibilities.")
     required_qualifications: List[str] = Field(description="job qualifications.")
     preferred_qualifications: Optional[List[str]] = Field(default=None, description="Additional qualifications as a plus")

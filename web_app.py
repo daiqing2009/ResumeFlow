@@ -15,6 +15,7 @@ import zipfile
 import streamlit as st
 
 from zlm import AutoApplyModel
+from zlm.prompts.job_fit_evaluate_prompt import JOB_FIT_PROMPT, CONTENT_PRESERVED_RATE
 from zlm.utils.utils import display_pdf, download_pdf, read_file, read_json
 from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity
 from zlm.variables import LLM_MAPPING
@@ -188,10 +189,10 @@ try:
             if get_resume_button:
                 with st.status("Building resume..."):
                     # resume_path, resume_details = resume_llm.resume_builder_bk(job_details, user_data, is_st=True)
-                    resume_path, resume_details = resume_llm.resume_builder(job_details, user_data, is_st=True)
+                    resume_path, resume_details, json_formatted_resume = resume_llm.resume_builder(job_details, user_data, is_st=True)
                     # st.write("Outer resume_path: ", resume_path)
                     # st.write("Outer resume_details is None: ", resume_details is None)
-                resume_col_1, resume_col_2, resume_col_3 = st.columns([0.35, 0.3, 0.25])
+                resume_col_1, resume_col_2, resume_col_3, resume_col_4 = st.columns([0.25, 0.25, 0.3, 0.2])
                 with resume_col_1:
                     st.subheader("Generated Resume")
                 with resume_col_2:
@@ -212,23 +213,59 @@ try:
                 st.toast("Resume generated successfully!", icon="✅")
                 # Calculate metrics
                 st.subheader("Resume Metrics")
-                for metric in ['overlap_coefficient', 'cosine_similarity']:
-                    user_personalization = globals()[metric](json.dumps(resume_details), json.dumps(user_data))
-                    job_alignment = globals()[metric](json.dumps(resume_details), json.dumps(job_details))
-                    job_match = globals()[metric](json.dumps(user_data), json.dumps(job_details))
+                # for metric in ['job_fit_score', 'cosine_similarity']:
+                for metric in ['job_fit_score']:
+                    # user_personalization = globals()[metric](json.dumps(resume_details), json.dumps(json_formatted_resume))
+                    # job_alignment = globals()[metric](json.dumps(resume_details), json.dumps(job_details))
+                    # job_match = globals()[metric](json.dumps(json_formatted_resume), json.dumps(job_details))
+                    if metric == 'job_fit_score':
+                        title = "Job Fit Score"
+                        help_text = "Token space compares texts by looking at both exact and similar token. This method is suitable for evaluating a wide variety of resumes"
+                        prompt_original = JOB_FIT_PROMPT.format(job_description=json.dumps(job_details), resume= json.dumps(json_formatted_resume))
+                        prompt_refined = JOB_FIT_PROMPT.format(job_description=json.dumps(job_details), resume=json.dumps(resume_details))
 
-                    if metric == "overlap_coefficient":
+                        col_m_1, col_m_2, col_m_3, col_m_4 = st.columns(4)
+
+                        original_resume_eval = resume_llm.job_fit_score_evaluation_extraction(eval_prompt=prompt_original)
+                        refined_resume_eval = resume_llm.job_fit_score_evaluation_extraction(eval_prompt=prompt_refined)
+                        if original_resume_eval is not None and isinstance(original_resume_eval, dict):
+                            if refined_resume_eval is not None and isinstance(refined_resume_eval, dict):
+                                print("Job Fit Score(original resume): ", original_resume_eval.get("overall_score"))
+                                print("Job Fit Score(refined resume): ", refined_resume_eval.get("overall_score"))
+                                print("Missing skills(original resume): ", original_resume_eval.get("missing_skills"))
+                                print("Missing skills(refined resume): ", refined_resume_eval.get("missing_skills"))
+                                job_alignment_original = json.dumps(original_resume_eval)
+                                job_alignment_refined = json.dumps(refined_resume_eval)
+                                score1 = float(original_resume_eval.get("overall_score"))
+                                score2 = float(refined_resume_eval.get("overall_score"))
+                                col_m_1.metric(label=":green[Job Fit Score Old]", value=f"{score1:.3f}", delta="(old resume)", delta_color="off")
+                                col_m_2.metric(label=":blue[Job Fit Score New]", value=f"{score2:.3f}", delta="(new resume)", delta_color="off")
+                                col_m_3.metric(label=":violet[Missing skills]", value=", ".join(refined_resume_eval.get("missing_skills", [])), delta="(new resume)", delta_color="off")
+                                st.json(original_resume_eval)
+                                st.json(refined_resume_eval)
+
+                        cosine_sim_score = cosine_similarity(json.dumps(json_formatted_resume), json.dumps(resume_details))
+                        prompt_content_preserve = CONTENT_PRESERVED_RATE.format(original_resume=json.dumps(json_formatted_resume), refined_resume=json.dumps(resume_details), cosine_score=f"{cosine_sim_score:.3f}")
+                        content_preserve_rate_eval = resume_llm.job_fit_score_evaluation_extraction(eval_prompt=prompt_content_preserve)
+                        if content_preserve_rate_eval is not None and isinstance(content_preserve_rate_eval, dict):
+                            score3 = content_preserve_rate_eval.get("overall_rate")
+                            col_m_4.metric(label=":orange[Preservation Rate]", value=score3, delta="(old resume, new resume)", delta_color="off")
+                            st.json(content_preserve_rate_eval)
+                    elif metric == "overlap_coefficient":
                         title = "Token Space"
                         help_text = "Token space compares texts by looking at the exact token (words part of a word) they use. It's like a word-for-word matching game. This method is great for spotting specific terms or skills, making it especially useful for technical resumes. However, it might miss similarities when different words are used to express the same idea. For example, \"manage\" and \"supervise\" would be seen as different in token space, even though they often mean the same thing in job descriptions."
                     elif metric == "cosine_similarity":
                         title = "Latent Space"
                         help_text = "Latent space looks at the meaning behind the words, not just the words themselves. It's like comparing the overall flavor of dishes rather than their ingredient lists. In this space, words with similar meanings are grouped together, even if they're spelled differently. For example, \"innovate\" and \"create\" would be close in latent space because they convey similar ideas. This method is particularly good at understanding context and themes, which is how AI language models actually process text. It's done by calculating cosine similarity between vector embeddings of two texts. By using latent space, we can see if the AI-generated resume captures the essence of the job description, even if it uses different wording."
+                    else:
+                        title = "Empty Space"
+                        help_text = ""
 
                     st.caption(f"## **:rainbow[{title}]**", help=help_text)
-                    col_m_1, col_m_2, col_m_3 = st.columns(3)
-                    col_m_1.metric(label=":green[User Personalization Score]", value=f"{user_personalization:.3f}", delta="(new resume, old resume)", delta_color="off")
-                    col_m_2.metric(label=":blue[Job Alignment Score]", value=f"{job_alignment:.3f}", delta="(new resume, job details)", delta_color="off")
-                    col_m_3.metric(label=":violet[Job Match Score]", value=f"{job_match:.3f}", delta="[old resume, job details]", delta_color="off")
+                    # col_m_1, col_m_2, col_m_3 = st.columns(3)
+                    # col_m_1.metric(label=":green[User Personalization Score]", value=f"{user_personalization:.3f}", delta="(new resume, old resume)", delta_color="off")
+                    # col_m_2.metric(label=":blue[Job Alignment Score]", value=f"{job_alignment:.3f}", delta="(new resume, job details)", delta_color="off")
+                    # col_m_3.metric(label=":violet[Job Match Score]", value=f"{job_match:.3f}", delta="[old resume, job details]", delta_color="off")
                 st.markdown("---")
 
             # Build Cover Letter

@@ -22,8 +22,8 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
-nltk.download('punkt', download_dir='C:\\nltk_data')
-nltk.data.path.append('C:\\nltk_data')
+nltk.download('punkt', download_dir='S:\\nltk_data')
+nltk.data.path.append('S:\\nltk_data')
 
 def remove_urls(list_of_strings):
     """Removes strings containing URLs from a list using regular expressions."""

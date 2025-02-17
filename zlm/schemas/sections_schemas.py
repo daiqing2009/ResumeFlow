@@ -36,6 +36,9 @@ class Link(BaseModel):
     name: Optional[str]= Field(default="",description="The name or title of the link.")
     link: Optional[str]= Field(default="",description="The URL of the link.")
 
+class Summary(BaseModel):
+    summary: str = Field(default="", description="The personal summary of resume")
+
 class Project(BaseModel):
     name: str | None= Field(description="The name or title of the project.")
     type: str | None = Field(description="The type or category of the project, such as hackathon, publication, professional, and academic.")

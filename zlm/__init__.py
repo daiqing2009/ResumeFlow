@@ -18,6 +18,7 @@ from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
 from zlm.prompts.convert_prompt import RESUME_CONVERT, JD_CONVERT
+from zlm.prompts.job_fit_evaluate_prompt import JOB_FIT_PROMPT
 from zlm.schemas.sections_schemas import ResumeSchema
 from zlm.utils import utils
 from zlm.utils.latex_ops import latex_to_pdf
@@ -153,6 +154,33 @@ class AutoApplyModel:
         return user_data
 
     @utils.measure_execution_time
+    def job_fit_score_evaluation_extraction(self, eval_prompt: str = ""):
+        """
+        Extract job fit score.
+
+        Args:
+            eval_prompt (str): The prompt of job fit score evaluation.
+
+        Returns:
+            dict: A dictionary containing the extracted job details.
+        """
+
+        print("\nExtracting job fit score...")
+        try:
+            if eval_prompt is not None and eval_prompt.strip() != "":
+                job_fit_score_details = self.llm.get_response(prompt=eval_prompt, need_json_output=True)
+                return job_fit_score_details
+            else:
+                raise Exception("Prompt empty. Unable to evaluate using job fit score")
+
+        except Exception as e:
+            print(e)
+            st.write("Please provide a valid prompt for job fit score.")
+            st.error(f"Error in job fit score evaluation, {e}")
+            return None
+
+
+    @utils.measure_execution_time
     def job_details_extraction(self, url: str=None, job_site_content: str=None, is_st=False):
         """
         Extracts job details from the specified job URL.
@@ -180,7 +208,7 @@ class AutoApplyModel:
                 #     partial_variables={"format_instructions": json_parser.get_format_instructions()}
                 #     ).format(job_description=job_site_content)
 
-                job_details = self.llm.get_response(prompt=JD_CONVERT+" Job description: {}".format(job_site_content), expecting_longer_output=True, need_json_output=True)
+                job_details = self.llm.get_response(prompt=JD_CONVERT+" Job description: {}".format(job_site_content), need_json_output=True)
 
                 if url is not None and url.strip() != "":
                     job_details["url"] = url
@@ -263,7 +291,7 @@ class AutoApplyModel:
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
             json_formatted_resume = self.llm.get_response(
-                prompt=RESUME_CONVERT+" Plain text data: {}".format(user_data), need_json_output=True)
+                prompt=RESUME_CONVERT+" Plain text data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
 
             # response_ud = self.llm.get_response(prompt="Extract the applicant's name, phone, email, github, and linkedin, as 'name', 'phone', 'email', 'github', 'linkedin' from the given JSON data, JSON data: {}".format(json_formatted_resume), expecting_longer_output=True, need_json_output=True)
             print("Response User Data Text: {}".format(json_formatted_resume))
@@ -278,12 +306,15 @@ class AutoApplyModel:
                 st.markdown("**Personal Info Section**")
                 st.write(resume_details)
 
-            if json_formatted_resume.get("skills") is not None:
-                resume_details['keyskills'] = json_formatted_resume['skills']
+            # if json_formatted_resume.get("skill_section") is not None:
+            #     resume_details['keyskills'] = json_formatted_resume.get("skill_section")
+                # resume_details['keyskills'] = [i for i in json_formatted_resume.get("skill_section") if len(i['skills'])]
+                # print("Response User Data Text: {}".format(resume_details.get("keyskills")))
+                # st.markdown("**Key skills Section**")
+                # st.write(resume_details.get("keyskills"))
                 # resume_details['keyskills'] = ', '.join(json_formatted_resume['skills'])
             # Other Sections
-            for section in ['work_experience', 'projects', 'skill_section', 'education', 'certifications',
-                            'achievements']:
+            for section in ['education', 'summary', 'skill_section', 'work_experience', 'projects', 'certifications','achievements']:
                 section_log = f"Processing Resume's {section.upper()} Section..."
                 if is_st: st.toast(section_log)
 
@@ -292,9 +323,11 @@ class AutoApplyModel:
                     input_variables=[str(section)],
                     template=section_mapping[section]["prompt"],
                     partial_variables={"format_instructions": json_parser.get_format_instructions()}
-                ).format(section_data=json_formatted_resume, job_description=json.dumps(job_details))
-
-                response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                ).format(section_data=json.dumps(json_formatted_resume), job_description=json.dumps(job_details))
+                if section == "projects" or section == "work_experience":
+                    response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                else:
+                    response = self.llm.get_response(prompt=prompt, need_json_output=True)
 
                 # Check for empty sections
                 if response is not None and isinstance(response, dict):
@@ -317,11 +350,11 @@ class AutoApplyModel:
             resume_latex = latex_to_pdf(resume_details, resume_path)
             # st.write(f"resume_pdf_path: {resume_pdf_path}")
 
-            return resume_path, resume_details
+            return resume_path, resume_details, json_formatted_resume
         except Exception as e:
             print(e)
             st.write("Error: \n\n", e)
-            return resume_path, resume_details
+            return resume_path, resume_details, json_formatted_resume
 
 
     @utils.measure_execution_time
@@ -358,7 +391,7 @@ class AutoApplyModel:
             st.write(resume_details)
 
             # Other Sections
-            for section in ['work_experience', 'projects', 'skill_section', 'education', 'certifications', 'achievements']:
+            for section in ['summary', 'work_experience', 'projects', 'skill_section', 'education', 'certifications', 'achievements']:
                 section_log = f"Processing Resume's {section.upper()} Section..."
                 if is_st: st.toast(section_log)
                 if user_data.get(section) is None:
@@ -370,8 +403,10 @@ class AutoApplyModel:
                     partial_variables={"format_instructions": json_parser.get_format_instructions()}
                     ).format(section_data = json.dumps(user_data.get(section)), job_description = json.dumps(job_details))
 
-                response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
-
+                if section == "projects" or section == "work_experience":
+                    response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                else:
+                    response = self.llm.get_response(prompt=prompt, need_json_output=True)
                 # Check for empty sections
                 if response is not None and isinstance(response, dict):
                     if section in response:
@@ -430,29 +465,42 @@ class AutoApplyModel:
             # job_details = read_json("/Users/saurabh/Downloads/JobLLM_Resume_CV/Netflix/Netflix_MachineLearning_JD.json")
 
             # Build resume
-            resume_path, resume_details = self.resume_builder(job_details, user_data)
+            resume_path, resume_details, json_formatted_resume = self.resume_builder(job_details, user_data)
             # resume_details = read_json("/Users/saurabh/Downloads/JobLLM_Resume_CV/Netflix/Netflix_MachineLearning_resume.json")
 
             # Generate cover letter
             cv_details, cv_path = self.cover_letter_generator(job_details, user_data)
 
             # Calculate metrics
-            for metric in ['jaccard_similarity', 'overlap_coefficient', 'cosine_similarity']:
+            # for metric in ['job_fit_score', 'jaccard_similarity', 'overlap_coefficient', 'cosine_similarity']:
+            for metric in ['job_fit_score']:
                 print(f"\nCalculating {metric}...")
 
                 if metric == 'vector_embedding_similarity':
-                    llm = self.get_llm_instance('')
+                    llm = self.get_llm_instance('Ollama')
                     user_personlization = globals()[metric](llm, json.dumps(resume_details), json.dumps(user_data))
                     job_alignment = globals()[metric](llm, json.dumps(resume_details), json.dumps(job_details))
                     job_match = globals()[metric](llm, json.dumps(user_data), json.dumps(job_details))
+                    print("User Personlization Score(resume,master_data): ", user_personlization)
+                    print("Job Alignment Score(resume,JD): ", job_alignment)
+                    print("Job Match Score(master_data,JD): ", job_match)
+                elif metric == 'job_fit_score':
+                    original_resume_eval = self.llm.get_response(prompt=JOB_FIT_PROMPT.format(job_description=json.dumps(job_details), resume=json.dumps(json_formatted_resume)),need_json_output=True)
+                    refined_resume_eval = self.llm.get_response(prompt=JOB_FIT_PROMPT.format(job_description=json.dumps(job_details), resume=json.dumps(resume_details)),need_json_output=True)
+                    print("Job Fit Score(original resume): ", original_resume_eval.get("overall_score"))
+                    print("Job Fit Score(refine resume): ", refined_resume_eval.get("overall_score"))
+                    print("Missing skills(original resume): ", original_resume_eval.get("missing_skills"))
+                    print("Missing skills(refine resume): ", refined_resume_eval.get("missing_skills"))
+                    job_alignment_original = json.dumps(original_resume_eval)
+                    job_alignment_refined = json.dumps(refined_resume_eval)
+
                 else:
                     user_personlization = globals()[metric](json.dumps(resume_details), json.dumps(user_data))
                     job_alignment = globals()[metric](json.dumps(resume_details), json.dumps(job_details))
                     job_match = globals()[metric](json.dumps(user_data), json.dumps(job_details))
-
-                print("User Personlization Score(resume,master_data): ", user_personlization)
-                print("Job Alignment Score(resume,JD): ", job_alignment)
-                print("Job Match Score(master_data,JD): ", job_match)
+                    print("User Personlization Score(resume,master_data): ", user_personlization)
+                    print("Job Alignment Score(resume,JD): ", job_alignment)
+                    print("Job Match Score(master_data,JD): ", job_match)
 
             print("\nDone!!!")
         except Exception as e:
