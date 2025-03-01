@@ -116,17 +116,6 @@
             \BLOCK{ endif } 
         \end{tabular}
     \end{rSection}
-\BLOCK{ endif } 
-
-% ACHIEVEMENTS SECTION
-\BLOCK{ if achievements }
-    \begin{rSection}{Achievements}
-        \begin{rSubsection}{}{}{}
-            \BLOCK{ for point in achievements}
-                \item \VAR{point}
-            \BLOCK{ endfor }
-        \end{rSubsection}
-    \end{rSection}
 \BLOCK{ endif }
 
 \newcommand\myfontsize{\fontsize{0.1pt}{0.1pt}\selectfont} \myfontsize \color{white}
