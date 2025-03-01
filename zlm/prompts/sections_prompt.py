@@ -1,48 +1,46 @@
-ACHIEVEMENTS = """write a resume section of "Achievements" in JSON format for a job applicant.
+ACHIEVEMENTS = """Instructions: Optimize the given "achievements" section in JSON format. 
+- Each achievement as a string text to output.
+- Retain at most 3 key achievements most aligned with job requirements.
+- If no data is given, return an empty list. 
+- Avoid adding or altering achievements beyond formatting improvements.
+- Ensure integrity, readability and accuracy.
+- Avoid hallucination.
 
-Instructions:
-- Analyze the given resume data
-- Highlight relevant achievements tailored to the job description. 
-- Remain the provided achievements.  
-- Highlight the strongest matches in the section.   
-- Ensure clarity, relevance, and grammatical accuracy.
-
-<achievements>
+<RESUME>
 {section_data}
-</achievements>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
   "achievements": [
     "Won E-yantra Robotics Competition 2018 - IITB.",
     "1st prize in “Prompt Engineering Hackathon 2023 for Humanities”",
     "Received the 'Extra Miller - 2021' award at Winjit Technologies for outstanding performance."
   ]
-</example>
+</output_example>
 
-{format_instructions}
 """
 
-CERTIFICATIONS = """Write a resume section of "Certifications" in JSON format for a job applicant.
+CERTIFICATIONS = """Instructions: Optimize the given "certifications" section in JSON format. 
+- Retain all relevant certification details.
+- Each certification as a string text to output.
+- If no data is provided, return an empty list. 
+- Avoid adding new certifications not present in the original data.
+- Ensure integrity and accuracy.
+- Avoid hallucination.
 
-Instructions:
-- Analyze the given resume data and extract the information of certifications.
-- Remain certifications highlighted in the given data.
-- Align certifications with the requirements in the job description.
-- Ensure grammatical accuracy and clarity. 
-
-<CERTIFICATIONS>
+<RESUME>
 {section_data}
-</CERTIFICATIONS>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
   "certifications": [
     {{
       "name": "Deep Learning Specialization",
@@ -54,137 +52,135 @@ Instructions:
       "by": "The Hong Kong University of Science and Technology.",
       "link": "https://www.coursera.org/account/accomplishments/verify/TYMQX23D4HRQ"
     }}
-  ],
-</example>
+  ]
+</output_example>
 
-{format_instructions}
 """
 
-EDUCATIONS = """Write a resume section of "Education" in JSON format for a job applicant.
+EDUCATIONS = """Instruction: Optimize the given "education" section in JSON format. 
+- Ensure integrity and consistency.
+- Retain all provided details of education and degree, including institution names, degrees, dates, GPA. 
+- Avoid missing or adding any educational details.
+- Avoid hallucination.
 
-Instructions:
-- Analyze the education details provided.  
-- Create a section highlighting the strongest matches.  
-- Ensure clarity, accuracy, and alignment with the job description.  
-- Use active voice and concise language.
-
-<Education>
+<RESUME>
 {section_data}
-</Education>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
 "education": [
   {{
     "degree": "Masters of Science - Computer Science (Thesis)",
     "university": "Arizona State University, Tempe, USA",
     "from_date": "Aug 2023",
     "to_date": "May 2025",
-    "grade": "3.8/4",
-    "coursework": [
-      "Operational Deep Learning",
-      "Software verification, Validation and Testing",
-      "Social Media Mining"
-    ]
+    "grade": "3.8/4"
+  }},
+  {{
+    "degree": "Bachelor of Science - Computer Science",
+    "university": "Bangalore University, Bangalore, India",
+    "from_date": "Aug 2019",
+    "to_date": "May 2023",
+    "grade": "3.6/4"
   }}
-],
-</example>
+]
+</output_example>
 
-{format_instructions}
 """
 
-PROJECTS = """Write a resume section in JSON format of "Project Experience" for a job applicant.
+PROJECTS = """Instructions: Improve the given "projects" section in JSON format. 
+- Retain listed projects in the resume.
+- Improve clarity and alignment with the job requirements.
+- Use clear, concise and professional language. 
+- Format each project with bullet points.
+- In each project description, it should include info, such as Task, Feature, Result.
+- Avoid hallucination or adding details not given in the original resume data..
 
-Instructions:
-- Refine the description of projects to align with job requirements.  
-- Highlight three relevant projects with impacts. 
-- Format each project with 3 bullet points.  
-- Quantify results and follow “Did X by doing Y, achieved Z” format.  
-- Use the STAR method (Situation, Task, Action, Result).
-- Structure each project using concise, active, and job-relevant language.
-
-<PROJECTS>
+<RESUME>
 {section_data}
-</PROJECTS>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_template>
 "projects": [
     {{
-      "name": "Search Engine for All file types - Sunhack Hackathon - Meta & Amazon Sponsored",
-      "type": "Hackathon",
-      "link": "https://devpost.com/software/team-soul-1fjgwo",
+      "name": "project name1",
+      "link": "https://devpost.com/software/project1",
       "from_date": "Nov 2023",
       "to_date": "Nov 2023",
       "description": [
-        "1st runner up prize in crafted AI persona, to explore LLM's subtle contextual understanding and create innovative collaborations between humans and machines.",
-        "Devised a TabNet Classifier Model having 98.7% accuracy in detecting forest fire through IoT sensor data, deployed on AWS and edge devices 'Silvanet Wildfire Sensors' using technologies TinyML, Docker, Redis, and celery."
+        "introduction of project task, key features, and results."
+      ]
+    }},
+    {{
+      "name": "project name2",
+      "link": "https://devpost.com/software/project2",
+      "from_date": "June 2022",
+      "to_date": "July 2022",
+      "description": [
+        "introduction of project task, key features, and results."
       ]
     }}
   ]
-  </example>
+</output_template>
 
-  {format_instructions}
-  """
+"""
 
-SKILLS = """Write a resume section of "Skills" in JSON format for a job applicant.
+SKILLS = """Instructions: Optimize the given "skill_section" section in JSON format.
+- Enhance the structure and alignment with the job description.
+- Ensure most relevant skills in resume are retained.
+- Add other relevant skills showed in other sections of resume if they are aligned with job requirements.
+- Remove irrelevant details.
+- Use precise and professional language.
+- Avoid adding new skills that are not showed in resume.
+- Avoid hallucination.
 
-Instructions:
-- Analyze the provided skills and job description.  
-- Focus on specific skills required for the job.
-- Highlight the most relevant skills in a JSON format.
-- Ensure clarity, accuracy, and alignment with the job description. 
-- Proofread for grammatical accuracy and clarity.
-
-<SKILL_SECTION>
+<RESUME>
 {section_data}
-</SKILL_SECTION>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
 "skill_section": [
     {{
       "name": "Programming Languages",
-      "skills": ["Python", "JavaScript", "C#", and so on ...]
+      "skills": ["Python", "JavaScript"]
     }},
     {{
       "name": "Cloud and DevOps",
-      "skills": [ "Azure", "AWS", and so on ... ]
+      "skills": [ "Azure", "AWS"]
     }}
   ]
-</example>
+</output_example>
 
-  {format_instructions}
-  """
+"""
 
-EXPERIENCE = """Write a resume section of "Work Experience" in JSON format for a job applicant. 
+EXPERIENCE = """Instructions: Optimize the given "work_experience" section in JSON format. 
+- Format each project as the following output_example.
+- In each experience, description should include information about responsibilities and impacts as string text.
+- Improve clarity, structure, and alignment with the job description.
+- Retain all important and relevant experience without altering factual details.
+- Avoid adding details not given in the original resume data.
 
-Instructions:
-- Match work experience tailored to the job requirements.
-- Highlight three relevant experiences with clear outcomes.
-- Include 3 bullet points per experience, quantifying results when possible.  
-- Use the STAR method (Situation, Task, Action, Result).
-- Format bullet points.
-- Use clear, concise, and job-relevant language. 
-
-<work_experience>
+<RESUME>
 {section_data}
-</work_experience>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
 "work_experience": [
     {{
       "role": "Software Engineer",
@@ -196,44 +192,31 @@ Instructions:
         "Engineered 10+ RESTful APIs Architecture and Distributed services; Designed 30+ low-latency responsive UI/UX application features with high-quality web architecture; Managed and optimized large-scale Databases. (Systems Design)",  
         "Initiated and Designed a standardized solution for dynamic forms generation, with customizable CSS capabilities feature, which reduces development time by 8x; Led and collaborated with a 12 member cross-functional team. (Idea Generation)" 
       ]
-    }},
-    {{
-      "role": "Research Intern",
-      "company": "IMATMI, Robbinsville",
-      "location": "New Jersey (Remote)"
-      "from_date": "Mar 2019",
-      "to_date": "Aug 2019",
-      "description": [
-        "Conducted research and developed a range of ML and statistical models to design analytical tools and streamline HR processes, optimizing talent management systems for increased efficiency.",
-        "Created 'goals and action plan generation' tool for employees, considering their weaknesses to facilitate professional growth."
-      ]
     }}
-  ],
-</example>
+  ]
+</output_example>
 
-{format_instructions}
 """
 
-SUMMARY = """Write a resume section of "Summary" in JSON format for a job applicant.
+SUMMARY = """Instructions: Optimize the given "summary" section in JSON format. 
+- Retain key details while enhancing clarity, conciseness, and alignment with the job description. 
+- Ensure a strong, informative summary without adding new, unprovided content.
+- Remove irrelevant and redundant content.
+- No more than 100 words.
+- Avoid hallucination
 
-Instructions:
-- Improve the content of summary section
-- Match experience and personal summary tailored to the job requirements.
-- Remain the key information of original resume
-- Ensure clarity, accuracy, and make the summary informative
-
-<summary>
+<RESUME>
 {section_data}
-</summary>
+</RESUME>
 
 <job_description>
 {job_description}
 </job_description>
 
-<example>
+<output_example>
 {{
   "summary": "Results-driven Marketing Professional with 5+ years of experience in digital marketing, brand strategy, and campaign management. Proven track record of increasing online engagement by 40% and driving a 25% boost in sales through data-driven strategies. Skilled in SEO, social media marketing, and analytics tools like Google Analytics and HubSpot. Passionate about creating innovative marketing solutions to help businesses grow. Seeking to leverage expertise in a dynamic, growth-oriented organization."
 }}
-</example>
-{format_instructions}
+</output_example>
+
 """

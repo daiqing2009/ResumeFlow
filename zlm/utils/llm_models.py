@@ -123,7 +123,7 @@ class Gemini:
 
 class OllamaModel:
     def __init__(self, model, system_prompt):
-        self.model = "gemma2:9b"
+        self.model = model
         self.system_prompt = system_prompt
     
     def get_response(self, prompt, expecting_longer_output=False, need_json_output=False):

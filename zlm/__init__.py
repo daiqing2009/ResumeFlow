@@ -95,7 +95,7 @@ class AutoApplyModel:
             dict: The resume data in plain text.
         """
         resume_text = extract_text(pdf_path)
-        print("resume_json Text:{}".format(resume_text))
+        # print("resume_json Text:{}".format(resume_text))
         return resume_text
 
     def resume_to_json(self, pdf_path):
@@ -118,7 +118,7 @@ class AutoApplyModel:
             ).format(resume_text=resume_text)
         print("PDF prompt:{}".format(prompt))
         resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
-        print("resume_json Text:{}".format(resume_json))
+        # print("resume_json Text:{}".format(resume_json))
         return resume_json
 
     @utils.measure_execution_time
@@ -142,7 +142,7 @@ class AutoApplyModel:
         if extension == ".pdf":
             user_data = self.resume_plain_text(user_data_path)
             # user_data = self.resume_to_json(user_data_path)
-            print("User data:{}".format(user_data))
+            # print("User data:{}".format(user_data))
         elif extension == ".json":
             user_data = utils.read_json(user_data_path)
         elif validators.url(user_data_path):
@@ -208,7 +208,7 @@ class AutoApplyModel:
                 #     partial_variables={"format_instructions": json_parser.get_format_instructions()}
                 #     ).format(job_description=job_site_content)
 
-                job_details = self.llm.get_response(prompt=JD_CONVERT+" Job description: {}".format(job_site_content), need_json_output=True)
+                job_details = self.llm.get_response(prompt=JD_CONVERT+"Job Description Data: {}".format(job_site_content), expecting_longer_output=True, need_json_output=True)
 
                 if url is not None and url.strip() != "":
                     job_details["url"] = url
@@ -291,10 +291,9 @@ class AutoApplyModel:
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
             json_formatted_resume = self.llm.get_response(
-                prompt=RESUME_CONVERT+" Plain text data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
+                prompt=RESUME_CONVERT+"Resume Data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
 
-            # response_ud = self.llm.get_response(prompt="Extract the applicant's name, phone, email, github, and linkedin, as 'name', 'phone', 'email', 'github', 'linkedin' from the given JSON data, JSON data: {}".format(json_formatted_resume), expecting_longer_output=True, need_json_output=True)
-            print("Response User Data Text: {}".format(json_formatted_resume))
+            print("Response User Data Text: {}".format(json.dumps(json_formatted_resume)))
             if json_formatted_resume is not None and isinstance(json_formatted_resume, dict):
                 resume_details["personal"] = {
                     "name": json_formatted_resume.get("name") if json_formatted_resume.get("name") is not None else "",
@@ -304,37 +303,37 @@ class AutoApplyModel:
                     "linkedin": json_formatted_resume.get("linkedin") or ""
                 }
                 st.markdown("**Personal Info Section**")
+                # resume_details["education"] = json_formatted_resume.get("education") if json_formatted_resume.get("education") is not None else []
+                # st.markdown("**Education Info Section**")
+                # resume_details["certifications"] = json_formatted_resume.get("certifications") if json_formatted_resume.get("certifications") is not None else []
+                # st.markdown("**Certification Info Section**")
+                # resume_details["achievements"] = json_formatted_resume.get("achievements") if json_formatted_resume.get("achievements") is not None else []
+                # st.markdown("**Achievement Info Section**")
                 st.write(resume_details)
-
-            # if json_formatted_resume.get("skill_section") is not None:
-            #     resume_details['keyskills'] = json_formatted_resume.get("skill_section")
-                # resume_details['keyskills'] = [i for i in json_formatted_resume.get("skill_section") if len(i['skills'])]
-                # print("Response User Data Text: {}".format(resume_details.get("keyskills")))
-                # st.markdown("**Key skills Section**")
-                # st.write(resume_details.get("keyskills"))
-                # resume_details['keyskills'] = ', '.join(json_formatted_resume['skills'])
             # Other Sections
             for section in ['education', 'summary', 'skill_section', 'work_experience', 'projects', 'certifications','achievements']:
                 section_log = f"Processing Resume's {section.upper()} Section..."
                 if is_st: st.toast(section_log)
-
+                # if json_formatted_resume[section] == []:
+                #     resume_details[section] = []
+                #     continue
                 json_parser = JsonOutputParser(pydantic_object=section_mapping[section]["schema"])
                 prompt = PromptTemplate(
                     input_variables=[str(section)],
                     template=section_mapping[section]["prompt"],
                     partial_variables={"format_instructions": json_parser.get_format_instructions()}
                 ).format(section_data=json.dumps(json_formatted_resume), job_description=json.dumps(job_details))
-                if section == "projects" or section == "work_experience":
-                    response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
-                else:
-                    response = self.llm.get_response(prompt=prompt, need_json_output=True)
+                # if section == "projects" or section == "work_experience":
+                #     response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                # else:
+                response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
 
                 # Check for empty sections
                 if response is not None and isinstance(response, dict):
                     if section in response:
                         if response[section]:
                             if section == "skill_section":
-                                resume_details[section] = [i for i in response['skill_section'] if len(i['skills'])]
+                                resume_details[section] = [i for i in response['skill_section']]
                             else:
                                 resume_details[section] = response[section]
 

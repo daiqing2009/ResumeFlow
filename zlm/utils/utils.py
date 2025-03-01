@@ -355,3 +355,26 @@ def key_value_chunking(data, prefix=""):
             chunks.append(f"{prefix}: {data}")
     
     return chunks
+
+def overall_score_calculate(*args):
+    """
+    Calculate the overall score.
+        Args:
+            args (list): a variable num of tuples, where each includes a score and a weight in float type.
+        Returns:
+            float: The overall score.
+    """
+    if not args:
+        return None
+    overall_score = 0.0
+    for tpl in args:
+        if len(tpl) == 2:
+            score, weight = tpl
+            if not isinstance(score, float) or not isinstance(weight, float):
+                print("Argument's type must be float.")
+                return None
+            overall_score += score * weight
+        else:
+            print("Argument is invalid.")
+            return None
+    return overall_score

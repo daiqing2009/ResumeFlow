@@ -34,7 +34,7 @@ LLM_MAPPING = {
     },
     'Ollama': {
         "api_env": None,
-        "model": ['gemma2:9b'],
+        "model": ['gemma2:9b', 'llama3.1', 'granite3.1-dense:8b'],
     }
 }
 
@@ -46,4 +46,12 @@ section_mapping = {
     "education": {"prompt":EDUCATIONS, "schema": Educations},
     "certifications": {"prompt":CERTIFICATIONS, "schema": Certifications},
     "achievements": {"prompt":ACHIEVEMENTS, "schema": Achievements},
+}
+
+job_fit_score_weights = {
+    "skills_score":0.3,
+    "experience_score":0.25,
+    "projects_score":0.15,
+    "education_score":0.25,
+    "summary_score":0.05
 }
