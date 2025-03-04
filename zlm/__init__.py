@@ -101,7 +101,8 @@ class AutoApplyModel:
             partial_variables={"format_instructions": json_parser.get_format_instructions()}
             ).format(resume_text=resume_text)
 
-        resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
+        # resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
+        resume_json = resume_text
         return resume_json
 
     @utils.measure_execution_time

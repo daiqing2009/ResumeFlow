@@ -56,9 +56,8 @@ Identify the key details from a job description and company overview to create a
 {job_description}
 </job_description>
 
-Note: The "keywords", "job_duties_and_responsibilities", and "required_qualifications" sections are particularly important for resume tailoring. Ensure these are as comprehensive and accurate as possible.
-
-{format_instructions}
+Note: The "keywords", "job_duties_and_responsibilities", and "required_qualifications" sections are particularly important for resume tailoring. Ensure these are as comprehensive and accurate as possible. If some sections are not available as per the format instruction, add placeholders.
+{format_instructions} 
 """
 
 CV_GENERATOR = """<task>
@@ -91,12 +90,6 @@ RESUME_DETAILS_EXTRACTOR = """<objective>
 Parse a text-formatted resume efficiently and extract diverse applicant's data into a structured JSON format.
 </objective>
 
-<input>
-The following text is the applicant's resume in plain text format:
-
-{resume_text}
-</input>
-
 <instructions>
 Follow these steps to extract and structure the resume information:
 
@@ -120,5 +113,11 @@ Follow these steps to extract and structure the resume information:
    - Review the extracted data for consistency and completeness.
    - Ensure all required fields are populated if the information is available in the resume.
 </instructions>
+
+<input>
+The following text is the applicant's resume in plain text format, don't use or add any extra information from previous learning and only take content from the following text:
+
+{resume_text}
+</input>
 
 {format_instructions}"""
