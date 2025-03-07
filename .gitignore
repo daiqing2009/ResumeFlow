@@ -6,3 +6,4 @@ input
 dist
 .venv
 .anima
+.python-version
