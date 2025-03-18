@@ -52,8 +52,8 @@ def read_json(file_path: str):
 
 
 def job_doc_name(job_details: dict, output_dir: str = "output", type: str = ""):
-    company_name = clean_string(job_details["company_name"])
-    job_title = clean_string(job_details["job_title"])[:15]
+    company_name = clean_string(job_details.get("company_name"))
+    job_title = clean_string(job_details.get("job_title"))[:15]
     doc_name = "_".join([company_name, job_title])
     doc_dir = os.path.join(output_dir, company_name)
     os.makedirs(doc_dir, exist_ok=True)

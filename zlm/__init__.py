@@ -199,7 +199,7 @@ class AutoApplyModel:
             # TODO: Handle case where it returns None. sometime, website take time to load, but scraper complete before that.
             if url is not None and url.strip() != "":
                 job_site_content = read_data_from_url(url)
-            if job_site_content:
+            if job_site_content is not None and job_site_content.strip() != "":
                 # json_parser = JsonOutputParser(pydantic_object=JobDetails)
                 
                 # prompt = PromptTemplate(
@@ -208,7 +208,7 @@ class AutoApplyModel:
                 #     partial_variables={"format_instructions": json_parser.get_format_instructions()}
                 #     ).format(job_description=job_site_content)
 
-                job_details = self.llm.get_response(prompt=JD_CONVERT+"Job Description Data: {}".format(job_site_content), expecting_longer_output=True, need_json_output=True)
+                job_details = self.llm.get_response(prompt=JD_CONVERT+"\n Job Description Data: {}".format(job_site_content), expecting_longer_output=True, need_json_output=True)
 
                 if url is not None and url.strip() != "":
                     job_details["url"] = url
@@ -291,7 +291,7 @@ class AutoApplyModel:
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
             json_formatted_resume = self.llm.get_response(
-                prompt=RESUME_CONVERT+"Resume Data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
+                prompt=RESUME_CONVERT+"\n Resume Data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
 
             print("Response User Data Text: {}".format(json.dumps(json_formatted_resume)))
             if json_formatted_resume is not None and isinstance(json_formatted_resume, dict):
@@ -317,6 +317,7 @@ class AutoApplyModel:
                 # if json_formatted_resume[section] == []:
                 #     resume_details[section] = []
                 #     continue
+                print("Processing section: "+section)
                 json_parser = JsonOutputParser(pydantic_object=section_mapping[section]["schema"])
                 prompt = PromptTemplate(
                     input_variables=[str(section)],

@@ -132,8 +132,8 @@ class OllamaModel:
                 llm = Ollama(
                     model=self.model,
                     system=self.system_prompt,
-                    temperature=0.8,
-                    top_p=0.9,
+                    temperature=0.9,
+                    top_p=0.8,
                     top_k=200,
                     num_predict=5000 if expecting_longer_output else None,
                     format='json' if need_json_output else None,

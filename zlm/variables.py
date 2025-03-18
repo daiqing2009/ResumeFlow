@@ -34,7 +34,7 @@ LLM_MAPPING = {
     },
     'Ollama': {
         "api_env": None,
-        "model": ['gemma2:9b', 'llama3.1', 'granite3.1-dense:8b'],
+        "model": ['hf.co/WildBurger/group1_finetuned_gemma2_v2','gemma2:9b', 'llama3.1', 'granite3.1-dense:8b'],
     }
 }
 

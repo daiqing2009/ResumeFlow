@@ -20,6 +20,7 @@ Instruction: Convert the resume data in plain text into JSON format as the follo
 
 JD_CONVERT = """
 Instruction: Convert the job description in plain text into JSON format as the following template.
+
 ** output template:
 {
     'company_name': "company name",

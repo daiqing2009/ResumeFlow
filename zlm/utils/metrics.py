@@ -15,7 +15,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import pairwise
 from zlm.utils.utils import key_value_chunking
-
+from rouge_score import rouge_scorer
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
@@ -130,7 +130,7 @@ def vector_embedding_similarity(llm, document1: str, document2: str) -> float:
 
     pass
 
-def normalize_text(text: str) -> list:
+def normalize_text(text: str) -> str:
     """Normalize the input text.
 
     This function tokenizes the text, removes stopwords and punctuations, 
@@ -163,4 +163,28 @@ def normalize_text(text: str) -> list:
     # lemmatizer=WordNetLemmatizer()
     # words=[lemmatizer.lemmatize(word) for word in words]
     
-    return words 
+    return " ".join(words)
+
+
+def compute_rouge(predictions, references):
+    """
+    Computes ROUGE scores between predictions and references.
+
+    Args:
+    - predictions (list of str): Model-generated content.
+    - references (list of str): Ground reference content.
+
+    Returns:
+    - dict: ROUGE-1, ROUGE-2, and ROUGE-L scores.
+    """
+    scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+    scores = [scorer.score(normalize_text(ref), normalize_text(pred)) for ref, pred in zip(references, predictions)]
+
+    # Averaging scores over all samples
+    avg_scores = {
+        'rouge1': sum(score['rouge1'].fmeasure for score in scores) / len(scores),
+        'rouge2': sum(score['rouge2'].fmeasure for score in scores) / len(scores),
+        'rougeL': sum(score['rougeL'].fmeasure for score in scores) / len(scores),
+    }
+
+    return avg_scores
