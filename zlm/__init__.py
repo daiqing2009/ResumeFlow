@@ -269,7 +269,7 @@ class AutoApplyModel:
             return None, None
 
     @utils.measure_execution_time
-    def resume_builder(self, job_details: dict, user_data: dict, is_st=False):
+    def resume_builder(self, job_details: dict, user_data: dict, is_st=False, bckup_llm=None):
         """
         Builds a resume based on the provided job details and user data.
 
@@ -327,7 +327,10 @@ class AutoApplyModel:
                 # if section == "projects" or section == "work_experience":
                 #     response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
                 # else:
-                response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                if section not in ["skill_section", "work_experience"] and bckup_llm is not None:
+                    response = bckup_llm.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                else:
+                    response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
 
                 # Check for empty sections
                 if response is not None and isinstance(response, dict):

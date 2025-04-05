@@ -1,0 +1,125 @@
+%==== PACKAGES AND OTHER DOCUMENT CONFIGURATIONS  ====%
+\documentclass{resume} % Use the custom resume.cls style
+\usepackage[left=0.25in,top=0.25in,right=0.25in,bottom=0.25in]{geometry} % Document margins
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{fontawesome} % For GitHub and LinkedIn symbols
+\usepackage{textcomp} % For mobile phone and email symbols
+% \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{xcolor}  % Required for defining custom colors
+\usepackage{hyperref}
+% Define your custom colors
+% \definecolor{myblue}{RGB}{173, 216, 246}
+% \definecolor{myblue}{RGB}{123, 176, 206}
+\definecolor{myblue}{RGB}{0, 164, 218}
+
+% Set hyperlink colors
+\hypersetup{
+    colorlinks=true,
+    linkcolor=myblue,
+    citecolor=myblue,
+    urlcolor=myblue
+}
+
+\usepackage{hyperref}
+
+%==== Headings ====%
+\name{AMEY SADANAND BHILEGAONKAR} % Your name
+\address{
+{\faPhone} \href{tel:480{-}616{-}3980}{480{-}616{-}3980} \quad {\faEnvelope} \href{mailto:ameybhilegaonkar3@gmail.com}{ameybhilegaonkar3@gmail.com} \quad {\faLinkedin} \href{github.com/ameygoes fl linkedin.com/in/amey{-}bhilegaonkar}{github.com/ameygoes fl linkedin.com/in/amey{-}bhilegaonkar} }
+
+\begin{document}
+
+%===== SUMMARY SECTION =====%
+    \begin{rSection}{Summary}
+        {\normalfont{Seeking a position as an Entry{-}level Python Programmer at Lumenix. Proven ability to develop and maintain high{-}quality Python code for machine learning applications. Skilled in various machine learning algorithms and libraries (TensorFlow, Keras, scikit{-}learn). Strong problem{-}solving skills and attention to detail. Collaborative team player with excellent communication abilities. Eager to contribute to the development of AI{-}powered software solutions.}}
+    \end{rSection}
+
+%===== WORK EXPERIENCE SECTION =====%
+    \begin{rSection}{Work Experience}
+                    \begin{rSubsection}
+                {Data Engineer {-} II}{June 2019 - July 2022}
+                                    {\normalfont{\textit{Publicis Sapient}}}
+                                {\normalfont{\textit{Bangalore, India}}}
+                                    \item Engineered complex ETL pipelines using Apache Spark, optimizing data extraction, transformation, and loading from diverse sources, such as Redshift, S3, Kinesis Streams, and Kafka.
+                                    \item Utilized distributed computing frameworks such as Apache Spark to manage large{-}scale data processing tasks, enhancing performance and resource utilization by 15\%.
+                                    \item Independently designed, and built database tools and scripts to simplify and automate reduced operation toil by 15\%.
+                                    \item Improved database performance by optimizing queries and tuning indexes, resulting in a 20\% reduction in query execution.
+                                    \item Revamped and maintained real{-}time data streaming solutions with Apache Spark, and GCP Cloud Run in large{-}scale infrastructure markets with over 30 million daily customer transactions.
+                                    \item Data Pipelines: Designed and implemented ETL/ELT pipelines using Apache Spark to load and transform data into various databases. This included optimizing SQL queries for better performance.
+                                    \item Stream Processing: Developed real{-}time stream processing applications using Apache Spark Streaming and Kafka to process large volumes of streaming data.
+                                    \item Cloud and DevOps: Managed infrastructure deployments on AWS, including the creation of VPCs, subnets, security groups, and load balancers. Also, implemented CI/CD pipelines using GitLab and Jenkins.
+                            \end{rSubsection}
+                    \begin{rSubsection}
+                {Lead Project Manager and Data Scientist}{April 2023 - June 2023}
+                                    {\normalfont{\textit{Opportunity Hackathon {-} Meta Sponsored}}}
+                                {\normalfont{\textit{Remote}}}
+                                    \item Spearheaded Elasticsearch implementation for blazing{-}fast search responses, with millisecond response times.
+                                    \item Converted and stored every file type data as vector embeddings, ensuring low{-}latency search capabilities.
+                                    \item Led Python FAST API development, providing efficient data access and retrieval.
+                                    \item Used Machine Learning techniques such as BERT, OCR, ResNet50, and Image Captioning to parse Image features.
+                                    \item Collaborated effectively with team members, optimizing task distribution for streamlined project completion.
+                            \end{rSubsection}
+            \end{rSection}
+
+%==== EDUCATION SECTION ====%
+\begin{rSection}{Education}
+                        \textbf{Arizona State University, Tempe, USA} \hfill {Aug 2023 - May 2025} \\
+                            {Masters of Science {-} Computer Science (Thesis)}
+                                        \hfill {(GPA: 3.8/4)}
+             
+             
+         
+                        \textbf{Bangalore University, Bangalore, India} \hfill {Aug 2019 - May 2023} \\
+                            {Bachelor of Science {-} Computer Science}
+                                        \hfill {(GPA: 3.6/4)}
+             
+             
+         
+    \end{rSection}
+
+% ==== PROJECTS SECTION =====%
+    \begin{rSection}{Projects}
+                    \begin{rSubsection}
+                                    {Search Engine for All file types {-} Opportunity Hackathon {-} Meta Sponsored}
+                                {\normalfont{April 2023 - June 2023}}{}{}
+                                    \item Spearheaded Elasticsearch implementation for blazing{-}fast search responses, with millisecond response times.
+                                    \item Converted and stored every file type data as vector embeddings, ensuring low{-}latency search capabilities.
+                                    \item Led Python FAST API development, providing efficient data access and retrieval.
+                                    \item Used Machine Learning techniques such as BERT, OCR, ResNet50, and Image Captioning to parse Image features.
+                                    \item Collaborated effectively with team members, optimizing task distribution for streamlined project completion.
+                            \end{rSubsection}
+                    \begin{rSubsection}
+                                    {Scalable Data Processing Pipeline {-} Neo4J, Docker, Kafka and Minikube}
+                                {\normalfont{November 2021 - April 2023}}{}{}
+                                    \item Designed and implemented a highly scalable and available data processing pipeline using Kubernetes, Kafka, Docker, Neo4j.
+                                    \item Orchestrated the setup of Kafka and Apache Zookeeper using Minikube, a lightweight Kubernetes implementation.
+                                    \item Streamlined data ingestion, and processing into Neo4j, applying PageRank and BFS for graph analysis.
+                            \end{rSubsection}
+                    \begin{rSubsection}
+                                    {Email Marketing Automation Platform}
+                                {\normalfont{November 2019 - April 2023}}{}{}
+                                    \item Engineered a standardized solution for dynamic forms generation, submissions, and distribution across various business applications.
+                                    \item Designed an advanced email marketing automation platform with real{-}time analytics capabilities.
+                                    \item Established a data warehouse to support online advertising and customer journey analysis.
+                            \end{rSubsection}
+            \end{rSection}
+
+%==== TECHNICAL STRENGTHS SECTION ====%
+    \begin{rSection}{Technical Skills}
+        \begin{tabular}{ @{} l @{\hspace{1ex}} l }
+                                \textbf{Programming Languages}: Python\\
+                                \textbf{Machine Learning}: scikit{-}learn, TensorFlow, Keras\\
+                                \textbf{Cloud Platforms}: AWS, Google Cloud\\
+                                \textbf{Databases}: SQL\\
+                                \textbf{Other Skills}: Agile/Scrum methodologies, Git, problem{-}solving skills, attention to detail, communication skills, teamwork\\
+                         
+        \end{tabular}
+    \end{rSection}
+
+\newcommand\myfontsize{\fontsize{0.1pt}{0.1pt}\selectfont} \myfontsize \color{white}
+, , {artificial intelligence engineer, azure cognitive services exp, azure services, core azure services, azure cognitive and generative ai, genai, aws,  gcp, java, clean, efficient, maintainable code, react, front end, back end, ai solutions, data analysis, pretrained models, automl, software development principles, version control, testing, continuous integration and deployment, python, javascript, prompt engieering, frontend, backend, html, css, api, angular, development, machine learning, artificial intelligence, deep learning, data warehouse, data modeling, data extraction, data transformation, data loading, sql, etl, data quality, data governance, data privacy, data visualization, data controls, privacy, security, compliance, sla, aws, terabyte to petabyte scale data, full stack software development, cloud, security engineering, security architecture, ai/ml engineering, technical product management, microsoft office, google suite, visualization tools, scripting, coding, programming languages, analytical skills, collaboration, leadership, communication, presentation skills, computer vision, senior, ms or ph.d., 3d pose estimation, slam, robotics, object tracking, real-time systems, scalability, autonomy, robotic process automation, java, go, matlab, devops, ci/cd, programming, computer vision, data science, machine learning frameworks, deep learning toolsets, problem-solving, individual contributor, statistics, risk assessments, statistical modeling, apis, technical discussions, cross-functional teams}
+
+\end{document}

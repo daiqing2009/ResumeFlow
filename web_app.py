@@ -164,9 +164,12 @@ try:
         
         if file is not None and (url != "" or text != ""):
             download_resume_path = os.path.join(os.path.dirname(__file__), "output")
-
             resume_llm = AutoApplyModel(api_key=api_key, provider=provider, model = model, downloads_dir=download_resume_path)
-            
+            if model == "hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0":
+                extract_model = "gemma2:9b"
+                extract_llm = AutoApplyModel(api_key=api_key, provider=provider, model=extract_model, downloads_dir=download_resume_path)
+            else:
+                extract_llm = resume_llm
             # Save the uploaded file
             os.makedirs("uploads", exist_ok=True)
             file_path = os.path.abspath(os.path.join("uploads", file.name))
@@ -175,7 +178,7 @@ try:
         
             # Extract user data
             with st.status("Extracting user data..."):
-                user_data = resume_llm.user_data_extraction(file_path, is_st=True)
+                user_data = extract_llm.user_data_extraction(file_path, is_st=True)
                 st.write(user_data)
 
             shutil.rmtree(os.path.dirname(file_path))
@@ -188,9 +191,9 @@ try:
             # Extract job details
             with st.status("Extracting job details..."):
                 if url != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(url=url, is_st=True)
+                    job_details, jd_path = extract_llm.job_details_extraction(url=url, is_st=True)
                 elif text != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(job_site_content=text, is_st=True)
+                    job_details, jd_path = extract_llm.job_details_extraction(job_site_content=text, is_st=True)
                 st.write(job_details)
 
             if job_details is None:
@@ -201,7 +204,7 @@ try:
             # Build Resume
             if get_resume_button:
                 with st.status("Building resume..."):
-                    resume_path, resume_details, json_formatted_resume = resume_llm.resume_builder(job_details, user_data, is_st=True)
+                    resume_path, resume_details, json_formatted_resume = resume_llm.resume_builder(job_details, user_data, is_st=True, bckup_llm=None)
                     # st.write("Outer resume_path: ", resume_path)
                     # st.write("Outer resume_details is None: ", resume_details is None)
                 resume_col_1, resume_col_2, resume_col_3 = st.columns([0.3, 0.3, 0.3])
@@ -235,8 +238,8 @@ try:
                         help_text = "Token space compares texts by looking at both exact and similar token. This method is suitable for evaluating a wide variety of resumes"
                         original_resume_eval, refined_resume_eval = {}, {}
 
-                        original_resume_llm_eval = get_llm_job_fit_eval_result(resume_llm, job_details, json_formatted_resume)
-                        refined_resume_llm_eval = get_llm_job_fit_eval_result(resume_llm, job_details, resume_details)
+                        original_resume_llm_eval = get_llm_job_fit_eval_result(extract_llm, job_details, json_formatted_resume)
+                        refined_resume_llm_eval = get_llm_job_fit_eval_result(extract_llm, job_details, resume_details)
                         overall_score1, overall_score2 = 0.0, 0.0
                         for k in job_fit_score_weights:
                             overall_score1 += float(original_resume_llm_eval.get(k)) * job_fit_score_weights.get(k)
@@ -249,8 +252,8 @@ try:
                         original_resume_eval[eval_key] = original_resume_llm_eval if original_resume_llm_eval is not None else {}
                         refined_resume_eval[eval_key] = refined_resume_llm_eval if refined_resume_llm_eval is not None else {}
 
-                        original_resume_llm_eval2 = get_llm_job_fit_eval_result(resume_llm, job_details, json_formatted_resume)
-                        refined_resume_llm_eval2 = get_llm_job_fit_eval_result(resume_llm, job_details, resume_details)
+                        original_resume_llm_eval2 = get_llm_job_fit_eval_result(extract_llm, job_details, json_formatted_resume)
+                        refined_resume_llm_eval2 = get_llm_job_fit_eval_result(extract_llm, job_details, resume_details)
                         overall_score3, overall_score4 = 0.0, 0.0
                         for k in job_fit_score_weights:
                             overall_score3 += float(original_resume_llm_eval2.get(k)) * job_fit_score_weights.get(k)

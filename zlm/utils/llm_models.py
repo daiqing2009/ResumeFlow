@@ -129,17 +129,22 @@ class OllamaModel:
     def get_response(self, prompt, expecting_longer_output=False, need_json_output=False):
         try:
             try:
+                if self.model not in ["hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0"]:
+                    temperature = 0.8
+                    top_p = 0.9
+                else :
+                    temperature = 0.5
+                    top_p = 0.8
                 llm = Ollama(
                     model=self.model,
                     system=self.system_prompt,
-                    temperature=0.9,
-                    top_p=0.8,
+                    temperature=temperature,
+                    top_p=top_p,
                     top_k=200,
-                    num_predict=5000 if expecting_longer_output else None,
+                    num_predict=4096 if expecting_longer_output else None,
                     format='json' if need_json_output else None,
                 )
                 content = llm.invoke(str(prompt))
-                print("Response from Llama: {}".format(content))
                 if need_json_output:
                     result = parse_json_markdown(content)
                 else:
@@ -148,7 +153,7 @@ class OllamaModel:
                 if result is None:
                     st.write("LLM Response")
                     st.markdown(f"```json\n{content.text}\n```")
-
+                print("Response from Llama: {}".format(result))
                 return result
 
             except requests.exceptions.RequestException as e:
