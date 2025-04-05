@@ -8,8 +8,9 @@ Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 '''
 
-from zlm.prompts.sections_prompt import EXPERIENCE, SKILLS, PROJECTS, EDUCATIONS, CERTIFICATIONS, ACHIEVEMENTS
-from zlm.schemas.sections_schemas import Achievements, Certifications, Educations, Experiences, Projects, SkillSections
+from zlm.prompts.sections_prompt import EXPERIENCE, SKILLS, PROJECTS, EDUCATIONS, CERTIFICATIONS, ACHIEVEMENTS, SUMMARY
+from zlm.schemas.sections_schemas import Achievements, Certifications, Educations, Experiences, Projects, SkillSections, \
+    Summary
 
 GPT_EMBEDDING_MODEL = "text-embedding-ada-002"
 # text-embedding-3-large, text-embedding-3-small
@@ -33,15 +34,24 @@ LLM_MAPPING = {
     },
     'Ollama': {
         "api_env": None,
-        "model": ['gemma2','deepseek-r1','llama3.2','llama3.1'],
+        "model": ['hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0','gemma2:9b','deepseek-r1','llama3.2','llama3.1'],
     }
 }
 
 section_mapping = {
+    "summary":{"prompt":SUMMARY, "schema": Summary},
     "work_experience": {"prompt":EXPERIENCE, "schema": Experiences},
     "skill_section": {"prompt":SKILLS, "schema": SkillSections},
     "projects": {"prompt":PROJECTS, "schema": Projects},
     "education": {"prompt":EDUCATIONS, "schema": Educations},
     "certifications": {"prompt":CERTIFICATIONS, "schema": Certifications},
     "achievements": {"prompt":ACHIEVEMENTS, "schema": Achievements},
+}
+
+job_fit_score_weights = {
+    "skills_score":0.3,
+    "experience_score":0.25,
+    "projects_score":0.1,
+    "education_score":0.25,
+    "summary_score":0.1
 }

@@ -10,6 +10,7 @@ Copyright (c) 2023 Saurabh Zinjad. All rights reserved | GitHub: Ztrimus
 
 import os
 import re
+import shutil
 import time
 import json
 import base64
@@ -26,29 +27,33 @@ OS_SYSTEM = platform.system().lower()
 
 
 def write_file(file_path, data):
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding='utf-8') as file:
         file.write(data)
 
 
 def read_file(file_path, mode="r"):
-    with open(file_path, mode) as file:
-        file_contents = file.read()
+    if mode == "r":
+        with open(file_path, "r", encoding='utf-8') as file:
+            file_contents = file.read()
+    else:
+        with open(file_path, mode) as file:
+            file_contents = file.read()
     return file_contents
 
 
 def write_json(file_path, data):
-    with open(file_path, "w") as json_file:
+    with open(file_path, "w", encoding='utf-8') as json_file:
         json.dump(data, json_file, indent=2)
 
 
 def read_json(file_path: str):
-    with open(file_path) as json_file:
+    with open(file_path, "r", encoding='utf-8') as json_file:
         return json.load(json_file)
 
 
 def job_doc_name(job_details: dict, output_dir: str = "output", type: str = ""):
-    company_name = clean_string(job_details["company_name"])
-    job_title = clean_string(job_details["job_title"])[:15]
+    company_name = clean_string(job_details.get("company_name"))
+    job_title = clean_string(job_details.get("job_title"))[:15]
     doc_name = "_".join([company_name, job_title])
     doc_dir = os.path.join(output_dir, company_name)
     os.makedirs(doc_dir, exist_ok=True)
@@ -179,7 +184,7 @@ def display_pdf(file, type="pdf"):
         # Store Pdf with convert_from_path function
         pages = convert_from_path(file)
         for page in pages:
-            st.image(page, use_column_width=True)
+            st.image(page, use_container_width=True)
 
     if type == "pdf":
         # Read file as bytes:
@@ -192,7 +197,7 @@ def display_pdf(file, type="pdf"):
             base64_pdf = base64.b64encode(bytes_data)
 
         # Iframe Embedding of PDF in HTML
-        pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" type="application/pdf" style="width:100%; height:100vh;"></iframe>'
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" type="application/pdf" style="width:100%; height:100vh;"></iframe>'
         
         # # Embedding PDF in HTML
         # pdf_display =  f"""<embed
@@ -206,51 +211,82 @@ def display_pdf(file, type="pdf"):
         st.markdown(pdf_display, unsafe_allow_html=True)
 
 def save_latex_as_pdf(tex_file_path: str, dst_path: str):
+    """
+    Convert a LaTeX (.tex) file to a PDF using pdflatex and move the resulting PDF
+    to the specified destination path.
+
+    Args:
+        tex_file_path (str): Path to the LaTeX (.tex) file.
+        dst_path (str): Destination path for the resulting PDF file.
+    """
     try:
-        # Call pdflatex to convert LaTeX to PDF
+        # Check if the input .tex file exists
+        if not os.path.exists(tex_file_path):
+            print(f"Error: File '{tex_file_path}' does not exist.")
+            return
+
+        # Ensure destination directory exists
+        dst_dir = os.path.dirname(dst_path)
+        if not os.path.exists(dst_dir):
+            os.makedirs(dst_dir)
+
+        # Change to the .tex file's directory
         prev_loc = os.getcwd()
-        os.chdir(os.path.dirname(tex_file_path))
+        tex_dir = os.path.dirname(tex_file_path)
+        os.chdir(tex_dir)
+
         try:
+            # Run pdflatex to generate the PDF
             result = subprocess.run(
-                ["pdflatex", tex_file_path, "&>/dev/null"],
+                ["pdflatex", os.path.basename(tex_file_path)],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                text=True
             )
-        except Exception as e:
-            print("Pdflatex failed to convert tex file to pdf.")
-            print(e)
 
+            # Check for errors in the pdflatex process
+            if result.returncode != 0:
+                print("Error: pdflatex failed to generate the PDF.")
+                print(result.stderr)
+                return
 
-        os.chdir(prev_loc)
-        resulted_pdf_path = tex_file_path.replace(".tex", ".pdf")
-        dst_tex_path = dst_path.replace(".pdf", ".tex")
+            # Move the resulting PDF to the destination path
+            resulted_pdf_path = tex_file_path.replace(".tex", ".pdf")
+            if os.path.exists(resulted_pdf_path):
+                shutil.move(resulted_pdf_path, dst_path)
+            else:
+                print("Error: PDF file not generated.")
+                return
 
-        os.rename(resulted_pdf_path, dst_path)
-        os.rename(tex_file_path, dst_tex_path)
+            print(f"PDF generated and moved to: {dst_path}")
 
-        if result.returncode != 0:
-            print("Exit-code not 0, check result!")
-        try:
-            pass
-            # open_file(dst_path)
-        except Exception as e:
-            print("Unable to open the PDF file.")
-            st.write("Unable to open the PDF file.")
+        finally:
+            # Restore the previous working directory
+            os.chdir(prev_loc)
 
-        filename_without_ext = os.path.basename(tex_file_path).split(".")[0]
-        unnessary_files = [
-            file
-            for file in os.listdir(os.path.dirname(os.path.realpath(tex_file_path)))
-            if file.startswith(filename_without_ext)
-        ]
+        # Clean up auxiliary files generated by pdflatex
+        # clean_auxiliary_files(tex_file_path)
 
-        for file in unnessary_files:
-            file_path = os.path.join(os.path.dirname(tex_file_path), file)
-            if os.path.exists(file_path):
-                os.remove(file_path)
     except Exception as e:
-        print(e)
-        return None
+        print(f"An unexpected error occurred: {e}")
+
+
+def clean_auxiliary_files(tex_file_path: str):
+    """
+    Remove auxiliary files generated during the LaTeX compilation.
+
+    Args:
+        tex_file_path (str): Path to the LaTeX (.tex) file.
+    """
+    tex_dir = os.path.dirname(tex_file_path)
+    tex_base = os.path.splitext(os.path.basename(tex_file_path))[0]
+    extensions = [".aux", ".log", ".toc", ".out"]
+
+    for ext in extensions:
+        aux_file = os.path.join(tex_dir, tex_base + ext)
+        if os.path.exists(aux_file):
+            os.remove(aux_file)
+            print(f"Removed: {aux_file}")
 
 def get_default_download_folder():
     """Get the default download folder for the current operating system."""

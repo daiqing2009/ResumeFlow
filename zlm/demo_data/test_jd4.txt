@@ -1,0 +1,25 @@
+Lumenix is dedicated to creating a workplace that values and respects people from diverse backgrounds and fostering a culture that enables great collaboration.
+Our Lumenix family is comprised of team members with a unique combination of talents, experiences, and perspectives. We are proud to develop and nurture emerging leaders as they progress through their careers.
+We are seeking an entry-level Python programmer to join our team. In this role, you will work closely with our senior developers to build and maintain our AI-powered software products.
+Your primary responsibility will be to write clean, efficient, and scalable Python code that implements machine learning models and algorithms.
+Responsibilities:
+Develop and maintain Python code that implements machine learning models and algorithms.
+Collaborate with senior developers to de.sign and implement AI-powered software solutions.
+Write clean, efficient, and well-documented code that follows best practices.
+Participate in code reviews and make improvements to existing code.
+Develop and execute test cases to ensure the quality of software products.
+Work collaboratively with cross-functional teams to deliver projects on time.
+Requirements:
+Bachelor's degree in Computer Science, Engineering, Mathematics, or related field.
+Strong programming skills in Python.
+Knowledge of machine learning algorithms and libraries (e.g., TensorFlow, Keras, scikit-learn).
+Understanding of software development principles and methodologies.
+Familiarity with one or more database technologies.
+Strong problem-solving skills and attention to detail.
+Good communication skills and ability to work in a team environment.
+Self-motivated and willing to learn new skills.
+Preferred Qualifications:
+Experience with one or more deep learning frameworks (e.g., PyTorch).
+Familiarity with version control systems (e.g., Git).
+Knowledge of cloud computing platforms (e.g., AWS, Google Cloud).
+Experience with Agile/Scrum methodologies.

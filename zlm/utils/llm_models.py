@@ -145,20 +145,24 @@ class OllamaModel:
     
     def get_response(self, prompt, expecting_longer_output=False, need_json_output=False):
         try:
+            if self.model not in ["hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0"]:
+                temperature = 0.8
+                top_p = 0.9
+            else:
+                temperature = 0.8
+                top_p = 0.999
             llm = Ollama(
                 model=self.model,
                 system=self.system_prompt,
-                temperature=0.8,
-                top_p=0.999,
+                temperature=temperature,
+                top_p=top_p,
                 top_k=250,
                 num_predict=4000 if expecting_longer_output else None,
-                # format='json' if need_json_output else None,
+                format='json' if need_json_output else None,
                 )
-            content = llm.invoke(prompt)
+            content = llm.invoke(str(prompt))
             print(content)
-            # print(len(content))
-            # print(content)
-            
+
             if (self.model == "deepseek-r1"):
                 content = extract_json_blocks(content)
                 print(content)

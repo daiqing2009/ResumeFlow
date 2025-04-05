@@ -9,6 +9,8 @@ Copyright (c) 2023 Saurabh Zinjad. All rights reserved | GitHub: Ztrimus
 '''
 
 import os
+import shutil
+
 import jinja2
 import streamlit as st
 from zlm.utils.utils import write_file, save_latex_as_pdf
@@ -68,9 +70,15 @@ def latex_to_pdf(json_resume, dst_path):
         resume_latex = use_template(latex_jinja_env, escaped_json_resume)
 
         tex_temp_path = os.path.join(os.path.realpath(templates_path), os.path.basename(dst_path).replace(".pdf", ".tex"))
-
+        print("tex temp path: {}".format(tex_temp_path))
+        dst_path = os.path.join(os.path.dirname(os.path.dirname(module_dir)), dst_path)
+        print("dst path: {}".format(dst_path))
         write_file(tex_temp_path, resume_latex)
         save_latex_as_pdf(tex_temp_path, dst_path)
+        shutil.copy(tex_temp_path, os.path.dirname(dst_path))
+        shutil.copy(tex_temp_path.replace(".tex", ".aux"), os.path.dirname(dst_path))
+        shutil.copy(tex_temp_path.replace(".tex", ".log"), os.path.dirname(dst_path))
+        shutil.copy(tex_temp_path.replace(".tex", ".out"), os.path.dirname(dst_path))
         return resume_latex
     except Exception as e:
         print(e)
