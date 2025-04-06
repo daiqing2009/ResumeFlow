@@ -16,8 +16,8 @@ import streamlit as st
 
 from zlm import AutoApplyModel
 from zlm.prompts.job_fit_evaluate_prompt import JOB_FIT_PROMPT, CONTENT_PRESERVED_RATE, MISSING_SKILL_PROMPT
-from zlm.utils.utils import display_pdf, download_pdf, read_file, read_json, overall_score_calculate
-from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity
+from zlm.utils.utils import display_pdf, download_pdf, read_file, read_json
+from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity, overall_score_calculate
 from zlm.variables import LLM_MAPPING, job_fit_score_weights
 
 # print("Installing playwright...")
