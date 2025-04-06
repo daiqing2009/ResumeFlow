@@ -13,6 +13,8 @@ import base64
 import shutil
 import zipfile
 import streamlit as st
+import pandas as pd
+import job_recommender
 
 from zlm import AutoApplyModel
 from zlm.prompts.job_fit_evaluate_prompt import JOB_FIT_PROMPT, CONTENT_PRESERVED_RATE, MISSING_SKILL_PROMPT
@@ -104,47 +106,172 @@ def create_overleaf_button(resume_path):
     """
     st.components.v1.html(html_code, height=40)
 
+#read extracted resume and job description data
+DATA_FOLDER = os.path.join(os.path.dirname(__file__), "data")
+FILENAME_RES_EXT = "resume_ext.json"
+RES_COLS_DISP = ['summary','skill_section' , 'work_experience', 'projects', 'education', 'certifications']
+RECOMM_COLS_DISP = ['job_title','company_name','job_responsibilities','required_qualifications','preferred_qualifications', 'keywords']
+
+@st.cache_data
+def init_resume():
+    df_res = pd.DataFrame(columns=RES_COLS_DISP)
+    with open(f"{DATA_FOLDER}/init/{FILENAME_RES_EXT}", "r") as f:
+        df_res = pd.read_json(f, orient="records")
+        f.close()
+    # print(f"df_res: {df_res['media'].head()}")
+    return df_res
+    
+@st.cache_data
+def init_jd():
+    st.session_state.df_recomm = pd.DataFrame(columns=RECOMM_COLS_DISP)
+
+@st.cache_resource
+def init_recomm():
+    recomm = job_recommender.Job_Recommender()
+    recomm.init()
+    return recomm
+
 try:
     # st.markdown("<h1 style='text-align: center; color: grey;'>Get :green[Job Aligned] :orange[Killer] Resume :sunglasses:</h1>", unsafe_allow_html=True)
     st.header("Get :green[Job Aligned] :orange[Personalized] Resume", divider='rainbow')
     # st.subheader("Skip the writing, land the interview")
-    
-    file = st.file_uploader("Upload your resume or any work-related data(PDF, JSON). [Recommended templates](https://github.com/Ztrimus/job-llm/tree/main/zlm/demo_data)", type=["json", "pdf"])
 
-    parse_resume = st.button("Parse Resume", key="parse_resume", type="primary", use_container_width=True)
-    if parse_resume and file is not None:
-        # Save the uploaded file
-        os.makedirs("uploads", exist_ok=True)
-        file_path = os.path.abspath(os.path.join("uploads", file.name))
-        with open(file_path, "wb") as f:
-            f.write(file.getbuffer())
+    col_head, col_choice,_,_ = st.columns([0.3, 0.7, 0.1, 0.1])
+    with col_head:
+        st.write("Resume Extractor:")
+    with col_choice:
+        is_preprocess_button = st.toggle('Use preprocessed resume', False)
+
+    if is_preprocess_button:
+        df_res = init_resume()
+        sel_res = st.dataframe(df_res[RES_COLS_DISP], on_select="rerun", selection_mode=["single-row"])
         
-        with st.status("Extracting user data..."):
-            download_resume_path = os.path.join(os.path.dirname(__file__), "output")
-            resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
-            
-            user_data = resume_llm.user_data_extraction(file_path, is_st=True)
-            st.write(user_data)
-        
-        if user_data is None:
-            st.error("User data not able process. Please upload a valid file")
-            st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
-            st.stop()
-                            
-
-    col_text, col_url,_,_ = st.columns(4)
-    with col_text:
-        st.write("Job Description Text")
-    with col_url:
-        is_url_button = st.toggle('Job URL', False)
-
-    url, text = "", ""
-    if is_url_button:
-        url = st.text_input("Enter job posting URL:", placeholder="Enter job posting URL here...", label_visibility="collapsed")
+        # print(sel_res)
+        if len(sel_res.selection.rows)==1:
+            st.success("You have selected one resume")
+            st.session_state.resume_disable = False
+            st.session_state.user_data = df_res.iloc[sel_res.selection.rows[0]].to_dict()
+        elif len(sel_res.selection.rows)>1:
+            st.warning("You can only select one resume")
+            st.session_state.resume_disable = True
+        else:
+            st.warning("No resume selected. Please select one.")
+            st.session_state.resume_disable = True
     else:
-        text = st.text_area("Paste job description text:", max_chars=5500, height=200, placeholder="Paste job description text here...", label_visibility="collapsed")
+        file = st.file_uploader("Upload your resume or any work-related data(PDF, JSON). [Recommended templates](https://github.com/Ztrimus/job-llm/tree/main/zlm/demo_data)", type=["json", "pdf"])
+        
+        parse_resume = st.button("Parse Resume", key="parse_resume", type="primary", use_container_width=True)
+        if parse_resume:
+            if file is None:
+                st.toast(":red[Upload user's resume or work related data to get started]", icon="⚠️")
+                st.session_state.resume_disable = True
+                # st.stop()
+            else:
+                # Save the uploaded file
+                os.makedirs("uploads", exist_ok=True)
+                file_path = os.path.abspath(os.path.join("uploads", file.name))
+                with open(file_path, "wb") as f:
+                    f.write(file.getbuffer())
+                
+                with st.status("Extracting user data..."):
+                    download_resume_path = os.path.join(os.path.dirname(__file__), "output")
+                    resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
+                    
+                    user_data = resume_llm.user_data_extraction(file_path, is_st=True)
+                    st.write(user_data)
+                    st.session_state.user_data = user_data
+                
+                if user_data is None:
+                    st.error("User data not able process. Please upload a valid file")
+                    st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
+                    st.session_state.resume_disable = True
+                    st.stop()
+                else:
+                    st.session_state.user_data = user_data
+                    st.session_state.resume_disable = False
+                    # print(f"user_data: {user_data}")
+                    # print(f"file_path: {file_path}")
 
+    col_head_jd, col_choice_jd,_,_ = st.columns([0.3, 0.7, 0.1, 0.1])
+    with col_head_jd:
+        st.write("JD Extractor:")
+    with col_choice_jd:
+        is_preprocess_jd = st.toggle('Use preprocessed JDs', False)    
+        
+    if is_preprocess_jd:
+        init_jd()
+        job_recommender = init_recomm()
+        def on_click_recom():
+            st.session_state.resume_sel_update = True
+        st.button("Recommend suitable jobs for selected resume", key="submit", type="primary", use_container_width=True, 
+                disabled=st.session_state.get("resume_disable", True),
+                on_click=on_click_recom)
 
+        if(st.session_state.get("resume_sel_update", False)):
+            try:
+                st.session_state.resume_sel_update = False
+                # res_ext = df_res.iloc[sel_res.selection.rows[0]]['skill_section']
+                res_ext = st.session_state.user_data
+                # print(f"res_ext({type(res_ext)}): {res_ext}")
+                with st.status("Getting recommendations...") as status:
+                    recommendations = job_recommender.recommend_by_resumeExt(res_ext)
+                    df_recomm = pd.DataFrame(recommendations)
+                    st.session_state.df_recomm = df_recomm
+                    status.update(
+                        label="Recommendations Ready!", state="complete"
+                    )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+            
+        sel_recomm = st.dataframe(st.session_state.df_recomm[RECOMM_COLS_DISP], on_select="rerun", selection_mode=["single-row"])
+        if len(sel_recomm.selection.rows)==1:
+            st.success("You have selected one JD")
+            st.session_state.jd_disable = False
+            st.session_state.job_details = st.session_state.df_recomm.iloc[sel_recomm.selection.rows[0]].to_dict()
+        elif len(sel_recomm.selection.rows)>1:
+            st.warning("You can only select one JD")
+            st.session_state.jd_disable = True
+        else:
+            st.warning("No JD selected. Please select one.")
+            st.session_state.jd_disable = True
+    else:
+        jd_url_or_text = st.radio(
+            "Select JD input type:",
+            options=["URL", "Text"],
+            horizontal=True,)
+        if jd_url_or_text == "URL":
+            jd_url = st.text_input("Enter job posting URL:", placeholder="Enter job posting URL here...", label_visibility="collapsed")
+        else:
+            jd_text = st.text_area("Paste job description text:", max_chars=5500, height=200, placeholder="Paste job description text here...", label_visibility="collapsed")
+
+        parse_jd = st.button("Parse JD", key="parse_jd", type="primary", use_container_width=True)
+        if parse_jd:
+            if (jd_url_or_text== "URL" and jd_url == "" ) or (jd_url_or_text== "Text" and jd_text == ""):
+                st.toast(":red[Please enter a job posting URL or paste the job description to get started]", icon="⚠️") 
+                # st.stop()
+            else:
+                download_resume_path = os.path.join(os.path.dirname(__file__), "output")
+                resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
+                
+                with st.status("Extracting job details..."):
+                    if jd_url != "":
+                        job_details, jd_path = resume_llm.job_details_extraction(url=jd_url, is_st=True)
+                    elif jd_text != "":
+                        job_details, jd_path = resume_llm.job_details_extraction(job_site_content=jd_text, is_st=True)
+                    st.write(job_details)
+                    
+                if job_details is None:
+                    st.session_state.jd_disable = True
+
+                    st.error("Please paste job description. Job details not able process.")
+                    st.markdown("<h3 style='text-align: center;'>Please paste job description text and try again!</h3>", unsafe_allow_html=True)
+                    st.stop()
+                else:
+                    st.session_state.jd_disable = False
+                    st.session_state.job_details = job_details
+                    # print(f"job_details: {job_details}")
+                    # print(f"jd_path: {jd_path}")    col_1, col_2, col_3 = st.columns(3)
     col_1, col_2, col_3 = st.columns(3)
     with col_1:
         provider = st.selectbox("Select provider([OpenAI](https://openai.com/blog/openai-api), [Gemini Pro](https://ai.google.dev/), [Ollama](http://localhost:11434):", LLM_MAPPING.keys())
@@ -172,60 +299,23 @@ try:
             # get_cover_letter_button = True
 
     if get_resume_button:
-        if file is None:
-            st.toast(":red[Upload user's resume or work related data to get started]", icon="⚠️")
-            st.stop()
-        
-        if url == "" and text == "":
-            st.toast(":red[Please enter a job posting URL or paste the job description to get started]", icon="⚠️") 
-            st.stop()
         
         if api_key == "" and provider != "Llama":
             st.toast(":red[Please enter the API key to get started]", icon="⚠️")
             st.stop()
-        
-        if file is not None and (url != "" or text != ""):
-            download_resume_path = os.path.join(os.path.dirname(__file__), "output")
-
-            resume_llm = AutoApplyModel(api_key=api_key, provider=provider, model = model, downloads_dir=download_resume_path)
             
+        download_resume_path = os.path.join(os.path.dirname(__file__), "output")
+        resume_llm = AutoApplyModel(api_key=api_key, provider=provider, model = model, downloads_dir=download_resume_path)
             
-            # --- removing resume extraction from get resume
-            # Save the uploaded file
-            # os.makedirs("uploads", exist_ok=True)
-            # file_path = os.path.abspath(os.path.join("uploads", file.name))
-            # with open(file_path, "wb") as f:
-            #     f.write(file.getbuffer())
-        
-            # Extract user data
-            # with st.status("Extracting user data..."):
-            #     user_data = resume_llm.user_data_extraction(file_path, is_st=True)
-            #     st.write(user_data)
+        #     shutil.rmtree(os.path.dirname(file_path))
 
-            # shutil.rmtree(os.path.dirname(file_path))
-
-            # if user_data is None:
-            #     st.error("User data not able process. Please upload a valid file")
-            #     st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
-            #     st.stop()
-
-            # Extract job details
-            with st.status("Extracting job details..."):
-                if url != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(url=url, is_st=True)
-                elif text != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(job_site_content=text, is_st=True)
-                st.write(job_details)
-
-            if job_details is None:
-                st.error("Please paste job description. Job details not able process.")
-                st.markdown("<h3 style='text-align: center;'>Please paste job description text and try again!</h3>", unsafe_allow_html=True)
-                st.stop()
-
+        if st.session_state.job_details and st.session_state.user_data:
+            # print(f"job_details: {job_details.keys()}")
+            # print(f"job title: {job_details['job_title']}& company: {job_details['company_name']} & keywords: {job_details['keywords']}") # required for resume builder
             # Build Resume
             if get_resume_button:
                 with st.status("Building resume..."):
-                    resume_path, resume_details, json_formatted_resume = resume_llm.resume_builder(job_details, user_data, is_st=True, bckup_llm=None)
+                    resume_path, resume_details, json_formatted_resume = resume_llm.resume_builder(st.session_state.job_details, st.session_state.user_data, is_st=True, bckup_llm=None)
                     # st.write("Outer resume_path: ", resume_path)
                     # st.write("Outer resume_details is None: ", resume_details is None)
                 resume_col_1, resume_col_2, resume_col_3 = st.columns([0.3, 0.3, 0.3])

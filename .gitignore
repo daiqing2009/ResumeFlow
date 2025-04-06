@@ -7,3 +7,6 @@ dist
 .venv
 .anima
 .python-version
+zlm/templates/
+data/db/
+data/db/*.db
