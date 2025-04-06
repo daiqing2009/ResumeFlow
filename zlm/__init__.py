@@ -24,7 +24,7 @@ from zlm.utils.latex_ops import latex_to_pdf
 from zlm.utils.llm_models import ChatGPT, Gemini, OllamaModel
 from zlm.utils.data_extraction import read_data_from_url, extract_text
 from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity, vector_embedding_similarity
-from zlm.prompts.resume_prompt import CV_GENERATOR, RESUME_WRITER_PERSONA, JOB_DETAILS_EXTRACTOR, RESUME_DETAILS_EXTRACTOR
+from zlm.prompts.resume_prompt import CV_GENERATOR, RESUME_WRITER_PERSONA, JOB_DETAILS_EXTRACTOR, RESUME_DETAILS_EXTRACTOR, RESUME_DATA_EXTRACTION_GEMMA, RESUME_JSON_STRUCTURE
 from zlm.schemas.job_details_schema import JobDetails
 from zlm.variables import DEFAULT_LLM_MODEL, DEFAULT_LLM_PROVIDER, LLM_MAPPING, section_mapping
 
@@ -94,16 +94,22 @@ class AutoApplyModel:
         """
         resume_text = extract_text(pdf_path)
 
-        json_parser = JsonOutputParser(pydantic_object=ResumeSchema)
+        # json_parser = JsonOutputParser(pydantic_object=ResumeSchema)
 
+        # prompt = PromptTemplate(
+        #     template=RESUME_DETAILS_EXTRACTOR,
+        #     input_variables=["resume_text"],
+        #     partial_variables={"format_instructions": json_parser.get_format_instructions()}
+        #     ).format(resume_text=resume_text)
+        
         prompt = PromptTemplate(
-            template=RESUME_DETAILS_EXTRACTOR,
+            template=RESUME_DATA_EXTRACTION_GEMMA,
             input_variables=["resume_text"],
-            partial_variables={"format_instructions": json_parser.get_format_instructions()}
-            ).format(resume_text=resume_text)
+            partial_variables={"json_structure" : RESUME_JSON_STRUCTURE}
+        ).format(resume_text=resume_text)
 
-        # resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
-        resume_json = resume_text
+        resume_json = self.llm.get_response(prompt=prompt, need_json_output=True)
+        # resume_json = resume_text
         return resume_json
 
     @utils.measure_execution_time

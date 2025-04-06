@@ -315,6 +315,7 @@ def parse_json_markdown(json_string: str) -> dict:
         print(e)
         return None
 
+
 def get_prompt(system_prompt_path: str) -> str:
         """
         Reads the content of the file at the given system_prompt_path and returns it as a string.

@@ -121,3 +121,63 @@ The following text is the applicant's resume in plain text format, don't use or 
 </input>
 
 {format_instructions}"""
+
+RESUME_DATA_EXTRACTION_GEMMA = '''
+You are an expert at extracting structured information from text. Your task is to analyze the following text, which represents a resume or professional profile, and transform it into a JSON object with the specified fields. If a field is not present in the text, leave it as null, unless otherwise specified.
+
+**Input Text:**
+
+{resume_text}
+
+**Desired JSON Output Format:**
+
+```json
+{json_structure}
+```
+'''
+
+RESUME_JSON_STRUCTURE = '''
+{
+  "name": null,
+  "phone": null,
+  "email": null,
+  "linkedin": null,
+  "github": null,
+  "portfolio": null,
+  "summary": null,
+  "skill_section": {
+    "hard_skills": [],
+    "soft_skills": []
+  },
+  "education": [
+    {
+      "school": null,
+      "from_date": null,
+      "to_date": null,
+      "location": null,
+      "degree": null,
+      "courses": []
+    }
+  ],
+  "work_experience": [
+    {
+      "company_name": null,
+      "role": null,
+      "from_date": null,
+      "to_date": null,
+      "location": null,
+      "description": null
+    }
+  ],
+  "projects": [
+    {
+      "title": null,
+      "link": null,
+      "key_technologies": [],
+      "date": null,
+      "description": null
+    }
+  ],
+  "certifications": [],
+  "achievements": []
+}'''

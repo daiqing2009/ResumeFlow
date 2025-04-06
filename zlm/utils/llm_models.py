@@ -121,22 +121,25 @@ class Gemini:
         except Exception as e:
             print(e)
 
-def extract_json_blocks(text):
-    """
-    Extracts all JSON code blocks enclosed within ```json tags from a string.
-    
-    Args:
-        text (str): The input text containing JSON code blocks.
-    
-    Returns:
-        list: A list of strings containing the JSON code blocks.
-    """
-    # Find all JSON blocks using regex
-    json_blocks = re.findall(r'```json(.*?)```', text, re.DOTALL)
-    
-    # Clean and combine blocks
-    cleaned_blocks = [block.strip() for block in json_blocks]
-    return '\n\n'.join(cleaned_blocks) if cleaned_blocks else ""
+def json_load(text):
+    def fix_null_remove_json(text):
+        text = re.sub(r'\bNone\b', 'null', text)
+        control_chars = r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\t\r]" 
+        text = re.sub(control_chars, '', text)
+        pattern = r"```json\s*([\s\S]*?)```"
+        # pattern = r"<output>\s*([\s\S]*?)<output>"
+        match = re.search(pattern, text)
+        
+        if match:
+            return match.group(1).strip()
+        else:
+            return text
+    try:
+        return json.loads(fix_null_remove_json(text))
+    except Exception as e:
+        print(e)
+        print(text)
+        return None
 
 class OllamaModel:
     def __init__(self, model, system_prompt):
@@ -154,22 +157,25 @@ class OllamaModel:
             llm = Ollama(
                 model=self.model,
                 system=self.system_prompt,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=250,
-                num_predict=4000 if expecting_longer_output else None,
-                format='json' if need_json_output else None,
+                num_ctx=4096,
+                # temperature=0.8,
+                # top_p=0.999,
+                # top_k=250,
+                # num_predict=4000 if expecting_longer_output else None,
+                # # format='json' if need_json_output else None,
                 )
-            content = llm.invoke(str(prompt))
-            print(content)
-
-            if (self.model == "deepseek-r1"):
-                content = extract_json_blocks(content)
-                print(content)
+            content = llm.invoke(prompt)
+            # print(content)
+            # print(len(content))
+            # print(content)
+            
+            # if (self.model == "deepseek-r1"):
+            #     content = json_load(content)
+            #     print(content)
 
 
             if need_json_output:
-                result = parse_json_markdown(content)
+                result = json_load(content)
             else:
                 result = content
             

@@ -16,8 +16,8 @@ import streamlit as st
 
 from zlm import AutoApplyModel
 from zlm.prompts.job_fit_evaluate_prompt import JOB_FIT_PROMPT, CONTENT_PRESERVED_RATE, MISSING_SKILL_PROMPT
-from zlm.utils.utils import display_pdf, download_pdf, read_file, read_json, overall_score_calculate
-from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity
+from zlm.utils.utils import display_pdf, download_pdf, read_file, read_json
+from zlm.utils.metrics import jaccard_similarity, overlap_coefficient, cosine_similarity, overall_score_calculate
 from zlm.variables import LLM_MAPPING, job_fit_score_weights
 
 # print("Installing playwright...")
@@ -108,6 +108,29 @@ try:
     # st.markdown("<h1 style='text-align: center; color: grey;'>Get :green[Job Aligned] :orange[Killer] Resume :sunglasses:</h1>", unsafe_allow_html=True)
     st.header("Get :green[Job Aligned] :orange[Personalized] Resume", divider='rainbow')
     # st.subheader("Skip the writing, land the interview")
+    
+    file = st.file_uploader("Upload your resume or any work-related data(PDF, JSON). [Recommended templates](https://github.com/Ztrimus/job-llm/tree/main/zlm/demo_data)", type=["json", "pdf"])
+
+    parse_resume = st.button("Parse Resume", key="parse_resume", type="primary", use_container_width=True)
+    if parse_resume and file is not None:
+        # Save the uploaded file
+        os.makedirs("uploads", exist_ok=True)
+        file_path = os.path.abspath(os.path.join("uploads", file.name))
+        with open(file_path, "wb") as f:
+            f.write(file.getbuffer())
+        
+        with st.status("Extracting user data..."):
+            download_resume_path = os.path.join(os.path.dirname(__file__), "output")
+            resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
+            
+            user_data = resume_llm.user_data_extraction(file_path, is_st=True)
+            st.write(user_data)
+        
+        if user_data is None:
+            st.error("User data not able process. Please upload a valid file")
+            st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
+            st.stop()
+                            
 
     col_text, col_url,_,_ = st.columns(4)
     with col_text:
@@ -121,7 +144,6 @@ try:
     else:
         text = st.text_area("Paste job description text:", max_chars=5500, height=200, placeholder="Paste job description text here...", label_visibility="collapsed")
 
-    file = st.file_uploader("Upload your resume or any work-related data(PDF, JSON). [Recommended templates](https://github.com/Ztrimus/job-llm/tree/main/zlm/demo_data)", type=["json", "pdf"])
 
     col_1, col_2, col_3 = st.columns(3)
     with col_1:
@@ -133,23 +155,23 @@ try:
             api_key = st.text_input("Enter API key:", type="password", value="")
         else:
             api_key = None
-    st.markdown("<sub><sup>💡 GPT-4 is recommended for better results.</sup></sub>", unsafe_allow_html=True)
+    # st.markdown("<sub><sup>💡 GPT-4 is recommended for better results.</sup></sub>", unsafe_allow_html=True)
 
     # Buttons side-by-side with styling
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        get_resume_button = st.button("Get Resume", key="get_resume", type="primary", use_container_width=True)
+    # col1, col2, col3 = st.columns(3)    
+    get_resume_button = st.button("Get Resume", key="get_resume", type="primary", use_container_width=True)
+    # with col1:
 
-    with col2:
-        get_cover_letter_button = st.button("Get Cover Letter", key="get_cover_letter", type="primary", use_container_width=True)
+    # with col2:
+        # get_cover_letter_button = st.button("Get Cover Letter", key="get_cover_letter", type="primary", use_container_width=True)
 
-    with col3:
-        get_both = st.button("Resume + Cover letter", key="both", type="primary", use_container_width=True)
-        if get_both:
-            get_resume_button = True
-            get_cover_letter_button = True
+    # with col3:
+        # get_both = st.button("Resume + Cover letter", key="both", type="primary", use_container_width=True)
+        # if get_both:
+            # get_resume_button = True
+            # get_cover_letter_button = True
 
-    if get_resume_button or get_cover_letter_button:
+    if get_resume_button:
         if file is None:
             st.toast(":red[Upload user's resume or work related data to get started]", icon="⚠️")
             st.stop()
@@ -167,23 +189,25 @@ try:
 
             resume_llm = AutoApplyModel(api_key=api_key, provider=provider, model = model, downloads_dir=download_resume_path)
             
+            
+            # --- removing resume extraction from get resume
             # Save the uploaded file
-            os.makedirs("uploads", exist_ok=True)
-            file_path = os.path.abspath(os.path.join("uploads", file.name))
-            with open(file_path, "wb") as f:
-                f.write(file.getbuffer())
+            # os.makedirs("uploads", exist_ok=True)
+            # file_path = os.path.abspath(os.path.join("uploads", file.name))
+            # with open(file_path, "wb") as f:
+            #     f.write(file.getbuffer())
         
             # Extract user data
-            with st.status("Extracting user data..."):
-                user_data = resume_llm.user_data_extraction(file_path, is_st=True)
-                st.write(user_data)
+            # with st.status("Extracting user data..."):
+            #     user_data = resume_llm.user_data_extraction(file_path, is_st=True)
+            #     st.write(user_data)
 
-            shutil.rmtree(os.path.dirname(file_path))
+            # shutil.rmtree(os.path.dirname(file_path))
 
-            if user_data is None:
-                st.error("User data not able process. Please upload a valid file")
-                st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
-                st.stop()
+            # if user_data is None:
+            #     st.error("User data not able process. Please upload a valid file")
+            #     st.markdown("<h3 style='text-align: center;'>Please try again</h3>", unsafe_allow_html=True)
+            #     st.stop()
 
             # Extract job details
             with st.status("Extracting job details..."):
@@ -335,34 +359,34 @@ try:
                 st.markdown("---")
 
             # Build Cover Letter
-            if get_cover_letter_button:
-                with st.status("Building cover letter..."):
-                    cv_details, cv_path = resume_llm.cover_letter_generator(job_details, user_data, is_st=True)
-                cv_col_1, cv_col_2 = st.columns([0.7, 0.3])
-                with cv_col_1:
-                    st.subheader("Generated Cover Letter")
-                with cv_col_2:
-                    cv_data = read_file(cv_path, "rb")
-                    st.download_button(label="Download CV ⬇",
-                                    data=cv_data,
-                                    file_name=os.path.basename(cv_path),
-                                    # on_click=download_pdf(cv_path),
-                                    key="download_cv_button",
-                                    mime="application/pdf", 
-                                    use_container_width=True)
-                st.markdown(cv_details, unsafe_allow_html=True)
-                st.markdown("---")
-                st.toast("cover letter generated successfully!", icon="✅")
+            # if get_cover_letter_button:
+            #     with st.status("Building cover letter..."):
+            #         cv_details, cv_path = resume_llm.cover_letter_generator(job_details, user_data, is_st=True)
+            #     cv_col_1, cv_col_2 = st.columns([0.7, 0.3])
+            #     with cv_col_1:
+            #         st.subheader("Generated Cover Letter")
+            #     with cv_col_2:
+            #         cv_data = read_file(cv_path, "rb")
+            #         st.download_button(label="Download CV ⬇",
+            #                         data=cv_data,
+            #                         file_name=os.path.basename(cv_path),
+            #                         # on_click=download_pdf(cv_path),
+            #                         key="download_cv_button",
+            #                         mime="application/pdf", 
+            #                         use_container_width=True)
+            #     st.markdown(cv_details, unsafe_allow_html=True)
+            #     st.markdown("---")
+            #     st.toast("cover letter generated successfully!", icon="✅")
             
-            st.toast(f"Done", icon="👍🏻")
-            st.success(f"Done", icon="👍🏻")
-            st.balloons()
+            # st.toast(f"Done", icon="👍🏻")
+            # st.success(f"Done", icon="👍🏻")
+            # st.balloons()
             
-            refresh = st.button("Refresh")
+            # refresh = st.button("Refresh")
 
-            if refresh:
-                st.caching.clear_cache()
-                st.rerun()
+            # if refresh:
+            #     st.caching.clear_cache()
+            #     st.rerun()
         
 except Exception as e:
     st.error(f"An error occurred: {e}")
