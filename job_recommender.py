@@ -7,7 +7,6 @@ import torch
 torch.classes.__path__ = [] # add this line to manually set it to empty. 
 
 # Load the pre-trained model
-ITEM_SEPARATOR = " \n "
 # embedder = SentenceTransformer("jensjorisdecorte/JobBERT-v2")
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 max_seq_length = embedder.max_seq_length
@@ -17,8 +16,11 @@ def len_func(text):
     """Calculates the length of a text."""
     return len(embedder.tokenizer.tokenize(text))
 
+
+ITEM_SEPARATOR = " \n "
+# Define a custom text splitter
 text_splitter = RecursiveCharacterTextSplitter(
-    separators=["\n\n",ITEM_SEPARATOR, " "], #first split at paragraph level, if the chunk size exceeds, at sentence/item level, if still exceeds at word level.
+    separators=[ITEM_SEPARATOR, ","], #first split at paragraph level, if the chunk size exceeds, at sentence/item level, if still exceeds at word level.
     chunk_size = max_seq_length/2,
     chunk_overlap = max_seq_length/4,
     length_function = len_func,
@@ -109,11 +111,20 @@ class Job_Recommender:
         return res
 
 
-    def recommend_by_resumeExt(self, field , filter=None, limit=10, output_fields=['*']):
+    def recommend_by_resumeExt(self, user_data , filter=None, limit=10, output_fields=['*']):
         """Search for similar vectors in the collection."""
         #TODO: check schema of resume extraction
-        
-        vector = get_embeddings([ITEM_SEPARATOR.join(field)])
+        skill_section = user_data['skill_section']
+        # print(f"Skill section: {skill_section}")
+        if isinstance(skill_section, str):
+            to_vectorized = skill_section
+        elif isinstance(skill_section, dict):
+            to_vectorized = ITEM_SEPARATOR.join(skill_section.items())
+        elif isinstance(user_data['skill_section'], list):
+            to_vectorized = ITEM_SEPARATOR.join(map(str, skill_section))
+        else:
+            to_vectorized = str(user_data['skill_section'])
+        vector = get_embeddings([to_vectorized])
         # print(f"Vector: {type(vector)} and {vector[0].shape}")
         res = self.client.search(
             collection_name= self.collection_name,
