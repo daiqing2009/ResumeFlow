@@ -141,6 +141,12 @@ try:
         st.write("Resume Extractor:")
     with col_choice:
         is_preprocess_button = st.toggle('Use preprocessed resume', False)
+    
+    ## Intializing user_data and job_details session variables
+    st.session_state.user_data = None
+    st.session_state.resume_disable = True
+    st.session_state.job_details = None
+    st.session_state.jd_disable = True
 
     if is_preprocess_button:
         df_res = init_resume()
@@ -178,7 +184,7 @@ try:
                     resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
                     
                     user_data = resume_llm.user_data_extraction(file_path, is_st=True)
-                    st.write(user_data)
+                    # st.write(user_data)
                     st.session_state.user_data = user_data
                 
                 if user_data is None:
@@ -191,6 +197,9 @@ try:
                     st.session_state.resume_disable = False
                     # print(f"user_data: {user_data}")
                     # print(f"file_path: {file_path}")
+        if(st.session_state.user_data is not None):
+            with st.status("Resume details:"):
+                st.write(st.session_state.user_data)
 
     col_head_jd, col_choice_jd,_,_ = st.columns([0.3, 0.7, 0.1, 0.1])
     with col_head_jd:
@@ -240,6 +249,7 @@ try:
             "Select JD input type:",
             options=["URL", "Text"],
             horizontal=True,)
+        jd_url, jd_text = "", ""
         if jd_url_or_text == "URL":
             jd_url = st.text_input("Enter job posting URL:", placeholder="Enter job posting URL here...", label_visibility="collapsed")
         else:
@@ -254,12 +264,11 @@ try:
                 download_resume_path = os.path.join(os.path.dirname(__file__), "output")
                 resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
                 
-                with st.status("Extracting job details..."):
-                    if jd_url != "":
-                        job_details, jd_path = resume_llm.job_details_extraction(url=jd_url, is_st=True)
-                    elif jd_text != "":
-                        job_details, jd_path = resume_llm.job_details_extraction(job_site_content=jd_text, is_st=True)
-                    st.write(job_details)
+                if jd_url != "":
+                    job_details, jd_path = resume_llm.job_details_extraction(url=jd_url, is_st=True)
+                elif jd_text != "":
+                    job_details, jd_path = resume_llm.job_details_extraction(job_site_content=jd_text, is_st=True)
+                    # st.write(job_details)
                     
                 if job_details is None:
                     st.session_state.jd_disable = True
@@ -272,6 +281,9 @@ try:
                     st.session_state.job_details = job_details
                     # print(f"job_details: {job_details}")
                     # print(f"jd_path: {jd_path}")    col_1, col_2, col_3 = st.columns(3)
+    if st.session_state.jd_disable == False and st.session_state.job_details is not None:
+        with st.status("Extracted job details"):
+            st.write(st.session_state.job_details)
     col_1, col_2, col_3 = st.columns(3)
     with col_1:
         provider = st.selectbox("Select provider([OpenAI](https://openai.com/blog/openai-api), [Gemini Pro](https://ai.google.dev/), [Ollama](http://localhost:11434):", LLM_MAPPING.keys())

@@ -38,7 +38,7 @@ LLM_MAPPING = {
     },
     'Ollama': {
         "api_env": None,
-        "model": ['hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0','gemma2:9b','deepseek-r1','llama3.2','llama3.1'],
+        "model": ['hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0','gemma2','deepseek-r1','llama3.2','llama3.1'],
     }
 }
 

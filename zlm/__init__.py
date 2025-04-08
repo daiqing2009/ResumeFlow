@@ -307,6 +307,7 @@ class AutoApplyModel:
                                                           need_json_output=True)
                 else:
                     response = self.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
+                # print(response)
                 # Check for empty sections
                 if response is not None and isinstance(response, dict):
                     if section in response:
@@ -319,6 +320,7 @@ class AutoApplyModel:
                 if is_st:
                     st.markdown(f"**{section.upper()} Section**")
                     st.write(response)
+
 
             resume_path = utils.job_doc_name(job_details, self.downloads_dir, "resume")
             utils.write_json(resume_path, resume_details)
