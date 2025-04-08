@@ -123,6 +123,8 @@ class Gemini:
 
 def json_load(text):
     def fix_null_remove_json(text):
+        text = "placeholder before" + text + "placeholder after"
+        print(text)
         text = re.sub(r'\bNone\b', 'null', text)
         control_chars = r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\t\r]" 
         text = re.sub(control_chars, '', text)

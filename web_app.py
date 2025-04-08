@@ -143,10 +143,18 @@ try:
         is_preprocess_button = st.toggle('Use preprocessed resume', False)
     
     ## Intializing user_data and job_details session variables
-    st.session_state.user_data = None
-    st.session_state.resume_disable = True
-    st.session_state.job_details = None
-    st.session_state.jd_disable = True
+    # if st.session_state.user_data:
+    try:
+        if st.session_state.user_data == None:
+            pass
+    except:
+        st.session_state.user_data = None
+    
+    try:
+        if st.session_state.job_details == None:
+            pass
+    except:
+        st.session_state.job_details = None
 
     if is_preprocess_button:
         df_res = init_resume()
@@ -263,12 +271,12 @@ try:
             else:
                 download_resume_path = os.path.join(os.path.dirname(__file__), "output")
                 resume_llm = AutoApplyModel(provider='Ollama', model = "gemma2", downloads_dir=download_resume_path)
-                
-                if jd_url != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(url=jd_url, is_st=True)
-                elif jd_text != "":
-                    job_details, jd_path = resume_llm.job_details_extraction(job_site_content=jd_text, is_st=True)
-                    # st.write(job_details)
+                with st.status("Extracting job details..."):
+                    if jd_url != "":
+                        job_details, jd_path = resume_llm.job_details_extraction(url=jd_url, is_st=True)
+                    elif jd_text != "":
+                        job_details, jd_path = resume_llm.job_details_extraction(job_site_content=jd_text, is_st=True)
+                        # st.write(job_details)
                     
                 if job_details is None:
                     st.session_state.jd_disable = True
