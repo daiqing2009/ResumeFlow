@@ -1,6 +1,6 @@
 import json
 
-from zlm.utils.metrics import compute_rouge, cosine_similarity
+from zlm.utils.metrics import cosine_similarity
 
 ds_file_path1 = "C:/Users/Wilfried/Downloads/eval_projects_ds.json"
 ds_file_path2 = "C:/Users/Wilfried/Downloads/eval_projects_ds2.json"
@@ -57,8 +57,5 @@ for output in output_data:
 
 outlier_rate = num_outlier / total
 print(f"Outlier Rate: {outlier_rate:.2f}")
-rouge_score = compute_rouge(predictions, references)
-for r_s in rouge_score:
-    print(f"{r_s}: {rouge_score[r_s]:.3f}")
 avg_cos_sim_score = sum(cos_sim_scores) / valid_num_output
 print(f"Average COS similarity score: {avg_cos_sim_score:.3f}")
