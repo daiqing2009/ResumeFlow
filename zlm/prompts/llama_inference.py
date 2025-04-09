@@ -9,7 +9,8 @@ from zlm.utils.data_extraction import extract_text
 
 # Define the endpoint and your prompt
 OLLAMA_API_URL  = "http://localhost:11434/api/generate"  # Default Ollama API URL
-model_name = "hf.co/WildBurger/group1_finetuned_gemma2_v2"  # Replace with your model's name if different
+# model_name = "hf.co/WildBurger/group1_finetuned_gemma2_v3:Q8_0"  # Replace with your model's name if different
+model_name = "gemma2:9b"
 # pdf_file_path = "S:/ResumeFlow/zlm/demo_data/user_resume.pdf"
 # job_description = ""
 # try:
@@ -25,7 +26,7 @@ model_name = "hf.co/WildBurger/group1_finetuned_gemma2_v2"  # Replace with your 
 # prompt = JD_CONVERT+"\nJob Description Data: "+job_description
 # prompt = JOB_FIT_PROMPT.format(job_description = job_description, resume = resume)
 
-ds_file_path = "C:/Users/Wilfried/Downloads/finetuning_training_projects_ds.json"
+ds_file_path = "C:/Users/Wilfried/Downloads/eval_json_exp_ds3.json"
 json_data, inf_res = [],[]
 try:
     with open(ds_file_path, "r", encoding="utf-8") as j_file:  # Specify UTF-8 encoding
@@ -41,14 +42,14 @@ inference_llm = AutoApplyModel(api_key="", provider="Ollama", model = model_name
 count = 0
 for item in json_data:
     count+=1
-    if count <0:
+    if count <1:
         continue
-    if len(inf_res)>100:
+    if len(inf_res)>41:
         break
-    if item.get("input").get("resume").get("projects") is None or len(item.get("input").get("resume").get("projects")) < 1:
+    if item.get("input").get("resume").get("work_experience") is None or len(item.get("input").get("resume").get("work_experience")) < 1:
         continue
 
-    prompt = PROJECTS.format(section_data=json.dumps(item.get("input").get("resume")), job_description=json.dumps(item.get("input").get("job_description")))
+    prompt = EXPERIENCE.format(section_data=json.dumps(item.get("input").get("resume")), job_description=json.dumps(item.get("input").get("job_description")))
     response = inference_llm.llm.get_response(prompt=prompt, expecting_longer_output=True, need_json_output=True)
     # Payload to send
     # payload = {
@@ -73,10 +74,12 @@ for item in json_data:
                         continue
                     # j_tmp = json.loads(string_text)
                     json_response = {"resume": string_text}
+                elif isinstance(response.get("resume"), dict):
+                    json_response = {"work_experience" : response.get("resume").get("work_experience")}
                 else:
-                    json_response = {"projects" : response.get("resume").get("projects")}
+                    json_response = {"resume" : response.get("resume")}
             else:
-                json_response = {"projects": response.get("projects")}
+                json_response = {"work_experience": response.get("work_experience")}
         elif isinstance(response, dict):
             json_response = response
         print(json.dumps(json_response, indent=4))
@@ -88,7 +91,7 @@ for item in json_data:
         print(f"An error occurred: {e}")
 
 
-inference_output_ds = "C:/Users/Wilfried/Downloads/gemma2_inference_projects_output_ds.json"
+inference_output_ds = "C:/Users/Wilfried/Downloads/base_gemma2_exp_ds2.json"
 try:
     with open(inference_output_ds, "w+", encoding='utf-8') as output_file:
         json.dump(inf_res, output_file, indent=4)

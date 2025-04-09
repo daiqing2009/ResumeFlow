@@ -2,26 +2,19 @@ import json
 
 from zlm.utils.metrics import compute_rouge, cosine_similarity
 
-ds_file_path1 = "C:/Users/Wilfried/Downloads/eval_projects_ds.json"
-ds_file_path2 = "C:/Users/Wilfried/Downloads/eval_projects_ds2.json"
+# ds_file_path = "C:/Users/Wilfried/Downloads/inference_gemma2_skill_ds2.json"
+ds_file_path = "C:/Users/Wilfried/Downloads/base_gemma2_exp_ds2.json"
 output_data = []
+
 try:
-    with open(ds_file_path1, "r", encoding="utf-8") as j_file:  # Specify UTF-8 encoding
-        data1 = json.load(j_file)
+    with open(ds_file_path, "r", encoding="utf-8") as j_file2:  # Specify UTF-8 encoding
+        data = json.load(j_file2)
 except FileNotFoundError:
     print("File not found.")
 except Exception as e:
     print(f"An error occurred: {e}")
 
-try:
-    with open(ds_file_path2, "r", encoding="utf-8") as j_file2:  # Specify UTF-8 encoding
-        data2 = json.load(j_file2)
-except FileNotFoundError:
-    print("File not found.")
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-output_data = data1 + data2
+output_data = data
 total = len(output_data)
 print(f"Data Size: {total}")
 num_outlier = 0
@@ -57,8 +50,8 @@ for output in output_data:
 
 outlier_rate = num_outlier / total
 print(f"Outlier Rate: {outlier_rate:.2f}")
-rouge_score = compute_rouge(predictions, references)
-for r_s in rouge_score:
-    print(f"{r_s}: {rouge_score[r_s]:.3f}")
+# rouge_score = compute_rouge(predictions, references)
+# for r_s in rouge_score:
+#     print(f"{r_s}: {rouge_score[r_s]:.3f}")
 avg_cos_sim_score = sum(cos_sim_scores) / valid_num_output
 print(f"Average COS similarity score: {avg_cos_sim_score:.3f}")
