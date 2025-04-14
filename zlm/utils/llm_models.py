@@ -153,7 +153,7 @@ class OllamaModel:
                 if result is None:
                     st.write("LLM Response")
                     st.markdown(f"```json\n{content.text}\n```")
-                print("Response from Llama: {}".format(result))
+                print("Response from OLlama: {}".format(result))
                 return result
 
             except requests.exceptions.RequestException as e:
