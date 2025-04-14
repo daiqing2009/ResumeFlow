@@ -290,7 +290,11 @@ class AutoApplyModel:
             resume_details = dict()
             # Personal Information Section
             if is_st: st.toast("Processing Resume's Personal Info Section...")
-            json_formatted_resume = self.llm.get_response(
+            if bckup_llm is not None:
+                json_formatted_resume = bckup_llm.llm.get_response(
+                    prompt=RESUME_CONVERT + "\n Resume Data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
+            else:
+                json_formatted_resume = self.llm.get_response(
                 prompt=RESUME_CONVERT+"\n Resume Data: {}".format(user_data), expecting_longer_output=True, need_json_output=True)
 
             print("Response User Data Text: {}".format(json.dumps(json_formatted_resume)))
