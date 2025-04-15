@@ -1,67 +1,20 @@
 # ResumeFlow: An LLM-facilitated Pipeline for Personalized Resume Generation and Refinement 
-
-[![Demo Page](https://img.shields.io/badge/Project-Demo-FF4B4B?logo=streamlit)](https://resumeflow.streamlit.app/)
-[![ACM Digital Library](https://img.shields.io/badge/ACM-0085CA?logo=acm&logoColor=fff&style=flat)](https://dl.acm.org/doi/10.1145/3626772.3657680)
-[![arxiv paper](https://img.shields.io/badge/arXiv-Paper-B31B1B?logo=arxiv)](https://arxiv.org/abs/2402.06221)
-[![PyPI Latest Release](https://img.shields.io/pypi/v/zlm.svg?label=PyPI&color=3775A9&logo=pypi)](https://pypi.org/project/zlm/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/zlm.svg?label=PyPI%20downloads&color=blueviolet&target=blank)](https://pypi.org/project/zlm/)
-[![GitHub issues open](https://img.shields.io/github/issues/Ztrimus/job-llm.svg?color=orange&label=Issues&logo=github)](https://github.com/Ztrimus/job-llm/issues)
-[![License: MIT](https://img.shields.io/badge/License-MIT-success.svg?logo)](https://github.com/Ztrimus/job-llm/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-success.svg?logo)](https://github.com/daiqing2009/ResumeFlow/blob/main/LICENSE)
 
 ## Framework
-### Original Design
-[![Click here to see image of "Auto Job Aligned Personalized Resume Generation Pipeline"](https://github.com/Ztrimus/job-llm/blob/main/resources/auto_job_apply_workflow.jpg)](https://github.com/Ztrimus/job-llm/blob/main/resources/auto_job_apply_workflow.jpg)
-### Target Framework
-<img width="950" alt="image" src="https://github.com/user-attachments/assets/8040eeb1-af92-4c9c-aa44-bd31c04d29e3" />
+<img width="950" alt="image" src="https://github.com/daiqing2009/ResumeFlow/blob/main/resources/exp-job-recomm-arch.png" />
 
- All other known bugs, fixes, feedbacks, and feature requests can be reported on the [GitHub issues](https://github.com/Ztrimus/job-llm/issues) page.
+This repository was forked from https://github.com/Ztrimus/ResumeFlow 
 
-**Empower others, just like they helped you!** Contribute to this open source project & make a difference. ✨ *Create a branch, improve the code, & raise a pull request!*
-
-### Author & Contributor List
-#### 
-#### Original Authors
- - [Saurabh Zinjad](https://linkedin.com/in/saurabhzinjad) | [Ztrimus](https://github.com/Ztrimus) | szinjad@asu.edu
- - [Amey Bhilegaonkar](https://www.linkedin.com/in/amey-bhilegaonkar) | [ameygoes](https://github.com/ameygoes) | abhilega@asu.edu
- - [Amrita Bhattacharjee](https://www.linkedin.com/in/amritabh) | [Amritabh](https://github.com/Amritabh) | abhatt43@asu.edu
-
-## 1. Introduction:
-### 1.1. Our Proposal
-We're aiming to create a automated system that makes applying for jobs a breeze. Job hunting has many stages, and we see a chance to automate things and use LLM (Language Model) to make it even smoother. We're looking at different ways, both the usual and some new ideas, to integrate LLM into the job application process. The goal is to reduce how much you have to do and let LLM do its thing, making the whole process easier for you.
-### 1.2. References
-- [40+ AWESOME RESUME STATISTICS [2023]: WHAT JOB SEEKERS NEED TO KNOW](https://www.zippia.com/advice/resume-statistics/)
-### 1.3. Refer to this [Paper](https://arxiv.org/abs/2402.06221) for more details.
-
-## 2. Setup, Installation and Usage
-### 2.1. Prerequisites
+# Setup, Installation and Usage
+## Prerequisites
  - OS : Linux, Mac
  - Python : 3.11.6 and above
- - LLM API key: [OpenAI](https://platform.openai.com/account/api-keys) OR [Gemini Pro](https://ai.google.dev/)
+ - Ollama with local LLMs downloaded, we recommend using our fine-tuned model.
+ - LLM API key(Optional): [OpenAI](https://platform.openai.com/account/api-keys) OR [Gemini Pro](https://ai.google.dev/)
 
-### 2.2. Package Installation - Use as Library
 
-```bash
-pip install zlm
-```
-
- - Usage
-
-```python
-from zlm import AutoApplyModel
-
-job_llm = AutoApplyModel(
-    api_key="PROVIDE_API_KEY", 
-    provider="ENTER PROVIDER <gemini> or <openai>",
-    downloads_dir="[optional] ENTER FOLDER PATH WHERE FILE GET DOWNLOADED, By default, 'downloads' folder"
-)
-
-job_llm.resume_cv_pipeline(
-    "ENTER_JOB_URL", 
-    "YOUR_MASTER_RESUME_DATA" # .pdf or .json
-) # Return and downloads curated resume and cover letter.
-```
-
-### 2.4. Setup & Run Code - Use as Project
+## Setup & Run Code - Use as Project
 
 ```sh
 git clone https://github.com/Ztrimus/job-llm.git
@@ -107,49 +60,7 @@ cd job-llm
     --provider="openai" # openai, gemini
 ```
 
-## 3. Citations
-If you find JobLLM useful in your research or applications, please consider giving us a star 🌟 and citing it.
-
-```bibtex
-@inproceedings{10.1145/3626772.3657680,
-author = {Zinjad, Saurabh Bhausaheb and Bhattacharjee, Amrita and Bhilegaonkar, Amey and Liu, Huan},
-title = {ResumeFlow: An LLM-facilitated Pipeline for Personalized Resume Generation and Refinement},
-series = {SIGIR '24},
-booktitle = {Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
-publisher = {Association for Computing Machinery},
-doi = {10.1145/3626772.3657680},
-url = {https://doi.org/10.1145/3626772.3657680},
-year = {2024},
-isbn = {9798400704314},
-location = {Washington DC, USA},
-address = {New York, NY, USA},
-}
-```
-
-```bibtex
-@misc{zinjad2024resumeflow,
-      title={ResumeFlow: An LLM-facilitated Pipeline for Personalized Resume Generation and Refinement}, 
-      author={Saurabh Bhausaheb Zinjad and Amrita Bhattacharjee and Amey Bhilegaonkar and Huan Liu},
-      year={2024},
-      eprint={2402.06221},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
-}
-```
-
-## 4. License
-JobLLM is under the MIT License and is supported for commercial usage.
-
-## 5. TODO
-Need to find way to install following command in streamlit
-```sh
-ollama
-playwright
-"ollama pull llama3.1"
-"ollama pull bge-m3"
-```
-
-## 4. References
+## References
  - [Prompt engineering Guidelines](https://platform.openai.com/docs/guides/prompt-engineering)
  - [Overleaf LaTex Resume Template](https://www.overleaf.com/latex/templates/jakes-resume-anonymous/cstpnrbkhndn)
  - [Combining LaTeX with Python](https://tug.org/tug2019/slides/slides-ziegenhagen-python.pdf)
